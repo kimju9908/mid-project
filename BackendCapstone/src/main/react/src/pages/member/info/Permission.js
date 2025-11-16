@@ -17,6 +17,7 @@ const Permission = () => {
         const token = localStorage.getItem("accessToken");
         const data = await AuthApi.fetchUserData(token); // authApi의 fetchUserData 함수 호출
         setUserData(data); // 데이터 저장
+          console.log(data);
       } catch (error) {
         console.error("사용자 데이터 가져오기 실패:", error);
       }
@@ -51,9 +52,6 @@ const Permission = () => {
         // 파일 업로드 후 permissionUrl을 생성하여 서버로 보내기
         const permissionUrl = response.data.url; // 서버에서 반환된 URL
 
-
-        // permissionReqDto 생성
-  
   
         // 서버로 permissionReqDto 전송
         const saveResponse = await AuthApi.savePermission(permissionUrl)

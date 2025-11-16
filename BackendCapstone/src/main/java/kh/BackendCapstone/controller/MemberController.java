@@ -125,7 +125,7 @@ public class MemberController {
 			@RequestHeader("Authorization")String token,
 			@RequestBody MemberReqDto memberReqDto) {
 		boolean isValid = memberService.checkPassword(token, memberReqDto.getPwd());
-		return ResponseEntity.ok(isValid);  // 로그인 성공 시 true, 실패 시 false 반환
+		return ResponseEntity.ok(isValid);  // 로그인 성공 시 trueㅌ, 실패 시 false 반환
 	}
 
 

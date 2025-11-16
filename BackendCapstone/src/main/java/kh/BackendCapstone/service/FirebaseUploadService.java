@@ -63,63 +63,103 @@ public class FirebaseUploadService {
 			return "파일 업로드 중 오류가 발생했습니다.";
 		}
 	}
-	public String handleFileUploadWithName(MultipartFile file, String folderPath, String fileName) {
-		// Flask API로 요청 보내기
+//	public String handleFileUploadWithName(MultipartFile file, String folderPath, String fileName) {
+//		// Flask API로 요청 보내기
+//		String flaskUrl = "http://localhost:5000/spring/upload/firebase";
+//
+//		// 파일을 포함한 멀티파트 데이터 전송을 위한 HttpHeaders 설정
+//		HttpHeaders headers = new HttpHeaders();
+//
+//		// Multipart 파일과 폴더 경로를 전송하는 방식으로 변경
+//		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//		body.add("file", file.getResource());
+//		body.add("folderPath", "firebase/" + folderPath);
+//		body.add("fileName", fileName);
+//
+//		// HttpEntity로 요청 본문 만들기
+//		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+//
+//		try {
+//			// Flask API로 POST 요청 보내기
+//			ResponseEntity<String> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
+//			log.warn("플라스크 통신으로 인한 결과 : {}", response);
+//			// Flask 서버의 응답 처리
+//			return response.getBody();
+//		} catch (Exception e) {
+//			log.error("Flask 서버와의 통신 중 오류 발생: ", e);
+//			return "파일 업로드 중 오류가 발생했습니다.";
+//		}
+//	}
+//	@Transactional
+//	public String getNewPermission(MultipartFile file, String folderPath, String token) {
+//		try {
+//			// 토큰을 통해 Member 객체를 가져옴
+//			Member member = memberService.convertTokenToEntity(token);
+//
+//			// 폴더 경로를 동적으로 설정
+//			folderPath = getFolderPath(folderPath, member);
+//			String fileName = getFileName(member);
+//
+//			// Flask API에 파일 업로드 요청을 보내고 응답 받음
+//			String rspFlask = handleFileUploadWithName(file, folderPath, fileName);
+//			log.warn("!!!!!!!!!!!로그 확인!!!!!!!!!!!!! : {}", rspFlask);
+//
+//
+//			return rspFlask;
+//		} catch (Exception e) {
+//			log.error("파일 업로드 중 오류 발생: ", e);
+//			return null;
+//		}
+//	}
+//
+//	public String getFolderPath(String folderPath, Member member) {
+//		folderPath += "/" + member.getMemberId();
+//		return folderPath;
+//	}
+//
+//	public String getFileName(Member member) {
+//		int permissionSize = permissionRepository.countAllByMember(member);
+//		return member.getMemberId() + "_" + permissionSize;
+//	}
+@Transactional
+public String uploadPermissionFile(MultipartFile file, String folderPath, String token) {
+	try {
+		// 1) 토큰으로 멤버 조회
+		Member member = memberService.convertTokenToEntity(token);
+
+		// 2) 동적 폴더 경로 생성
+		String finalFolderPath = "firebase/" + folderPath + "/" + member.getMemberId();
+
+		// 3) 파일명 생성
+		int permissionSize = permissionRepository.countAllByMember(member);
+		String fileName = member.getMemberId() + "_" + permissionSize;
+
+		// 4) Flask API URL
 		String flaskUrl = "http://localhost:5000/spring/upload/firebase";
 
-		// 파일을 포함한 멀티파트 데이터 전송을 위한 HttpHeaders 설정
+		// 5) 멀티파트 데이터 생성
 		HttpHeaders headers = new HttpHeaders();
-
-		// Multipart 파일과 폴더 경로를 전송하는 방식으로 변경
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+
 		body.add("file", file.getResource());
-		body.add("folderPath", "firebase/" + folderPath);
+		body.add("folderPath", finalFolderPath);
 		body.add("fileName", fileName);
 
-		// HttpEntity로 요청 본문 만들기
 		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
 
-		try {
-			// Flask API로 POST 요청 보내기
-			ResponseEntity<String> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
-			log.warn("플라스크 통신으로 인한 결과 : {}", response);
-			// Flask 서버의 응답 처리
-			return response.getBody();
-		} catch (Exception e) {
-			log.error("Flask 서버와의 통신 중 오류 발생: ", e);
-			return "파일 업로드 중 오류가 발생했습니다.";
-		}
+		// 6) Flask로 전송
+		ResponseEntity<String> response =
+				restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
+
+		log.warn("Flask 응답 결과 : {}", response);
+
+		return response.getBody();
+
+	} catch (Exception e) {
+		log.error("파일 업로드 중 오류 발생: ", e);
+		return "파일 업로드 중 오류가 발생했습니다.";
 	}
-	@Transactional
-	public String getNewPermission(MultipartFile file, String folderPath, String token) {
-		try {
-			// 토큰을 통해 Member 객체를 가져옴
-			Member member = memberService.convertTokenToEntity(token);
-			
-			// 폴더 경로를 동적으로 설정
-			folderPath = getFolderPath(folderPath, member);
-			String fileName = getFileName(member);
-			
-			// Flask API에 파일 업로드 요청을 보내고 응답 받음
-			String rspFlask = handleFileUploadWithName(file, folderPath, fileName);
-			log.warn("!!!!!!!!!!!로그 확인!!!!!!!!!!!!! : {}", rspFlask);
-			
-			
-			return rspFlask;
-		} catch (Exception e) {
-			log.error("파일 업로드 중 오류 발생: ", e);
-			return null;
-		}
-	}
-	
-	public String getFolderPath(String folderPath, Member member) {
-		folderPath += "/" + member.getMemberId();
-		return folderPath;
-	}
-	
-	public String getFileName(Member member) {
-		int permissionSize = permissionRepository.countAllByMember(member);
-		return member.getMemberId() + "_" + permissionSize;
-	}
-	
+}
+
+
 }

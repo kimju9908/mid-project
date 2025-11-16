@@ -5,7 +5,6 @@ import kh.BackendCapstone.constant.Active;
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.constant.TextCategory;
 import kh.BackendCapstone.dto.request.AdminMemberReqDto;
-import kh.BackendCapstone.dto.request.TextBoardReqDto;
 import kh.BackendCapstone.dto.request.UnivReqDto;
 import kh.BackendCapstone.dto.response.AdminMemberResDto;
 import kh.BackendCapstone.dto.response.PermissionResDto;
@@ -37,7 +36,6 @@ public class AdminService {
 	private final MemberRepository memberRepository;
 	private final TextBoardRepository textBoardRepository;
 	private final TextBoardService textBoardService;
-	private final UserBankRepository userBankRepository;
 	private final MemberService memberService;
 	private final UnivService univService;
 	private final BankRepository bankRepository;
@@ -146,8 +144,10 @@ public class AdminService {
 			member.setAuthority(Authority.fromString(dto.getAuthority()));
 		}
 		if(dto.getWithdraw() != 0){
-			UserBank userBank = userBankRepository.findByMember_MemberId(member.getMemberId())
-				.orElseThrow(() -> new RuntimeException("금융 정보가 없습니다."));
+			UserBank userBank = member.getUserBank();
+			if (userBank == null) {
+				throw new RuntimeException("금융 정보가 없습니다.");
+			}
 			userBank.setWithdrawal(userBank.getWithdrawal() - dto.getWithdraw());
 		}
 		log.warn("수정하려는 회원 : {}", member);

@@ -13,9 +13,17 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class FirebaseUploadController {
 	private final FirebaseUploadService firebaseUploadService;
-	
+
 	@PostMapping("/upload")
-	public String uploadTest(@RequestParam("file") MultipartFile file, @RequestParam("folderPath") String folderPath, @RequestHeader("Authorization") String token) {
-		return firebaseUploadService.getNewPermission(file, folderPath, token);
+	public String uploadTest(
+			@RequestParam("file") MultipartFile file,
+			@RequestParam("folderPath") String folderPath,
+			@RequestHeader("Authorization") String token
+	) {
+		// "Bearer " 제거 후 실제 토큰만 추출
+		String pureToken = token.replace("Bearer ", "").trim();
+
+		return firebaseUploadService.uploadPermissionFile(file, folderPath, pureToken);
 	}
+
 }

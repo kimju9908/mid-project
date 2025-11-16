@@ -1,9 +1,8 @@
 package kh.BackendCapstone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.constant.Membership;
-import kh.BackendCapstone.constant.Membership;
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities;
 import lombok.*;
 
 import javax.persistence.*;
@@ -13,7 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "member")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "userBank") // userBank는 제외
+
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
@@ -51,11 +51,12 @@ public class Member {
     @ManyToOne
     @JoinColumn(name = "univ_id")
     private Univ univ;
+
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
-    @ManyToOne
-    @JoinColumn(name = "userbank_id")
+    @OneToOne
+    @JoinColumn(name = "userbank_id", unique = true)
     private UserBank userBank;
 
     @Enumerated(EnumType.STRING)

@@ -170,7 +170,7 @@
 //				// 4. Permission 객체 저장
 //				permissionRepository.save(permission);
 //			}
-		public boolean savePermission(String token, String permissionUrl) {
+		public boolean  savePermission(String token, String permissionUrl) {
 
 		 Long memberId = memberService.getMemberId(token);
 

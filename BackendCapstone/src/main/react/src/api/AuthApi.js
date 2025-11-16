@@ -177,9 +177,11 @@ const AuthApi = {
 
 			return response.data
 
+
 		} catch (error) {
 			console.error("회원 정보 요청 실패:", error.message || error);
 		}
+
 	},
 
 	fetchUserData: async (token) => {
@@ -205,6 +207,7 @@ const AuthApi = {
 			throw error; // 에러를 다시 던져 상위에서 처리할 수 있도록 함
 		}
 	},
+
 	saveRevenue: async (profit, token) => {
 		try {
 			const response = await axios.get(

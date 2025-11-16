@@ -49,43 +49,43 @@ const MemberEdit = () => {
   const [nickNameMessage, setNickNameMessage] = useState("");
 
   useEffect(() => {
-    const fetchMemberInfo = async () => {
+    const fetchData = async () => {
       try {
-        const memberData = await AuthApi.getMemberDetails();
-        if (memberData) {
-          setMemberInfo({
-            memberId: memberData.memberId,
-            name: memberData.name || "",
-            authority : memberData.authority ,
-            nickName: memberData.nickName || "",
-            email: memberData.email || "",
-            phone: memberData.phone || "",
-            univ: memberData.univ?.univName || "업로드 권한 확인에서 재학증명서를 등록해주세요 ",
-            univDept: memberData.univ?.univDept || "업로드 권한 확인에서 재학증명서를 등록해주세요",
-            bankName: memberData.bankName || "",
-            bankAccount: memberData.bankAccount || "",
-            userId : memberData.userId
-          });
-        } else {
-          throw new Error("회원 정보가 존재하지 않습니다.");
-        }
+          // 두 API를 병렬로 호출
+          const [memberData, bankData] = await Promise.all([
+            AuthApi.getMemberDetails(),
+            AuthApi.getBankList(),
+          ]);
+        console.log(memberData);
+            // 은행 목록 저장
+          setBankList(bankData);
+
+          if (memberData) {
+            setMemberInfo({
+              memberId: memberData.memberId,
+              name: memberData.name || "",
+              authority: memberData.authority,
+              nickName: memberData.nickName || "",
+              email: memberData.email || "",
+              phone: memberData.phone || "",
+              univ: memberData.univ?.univName || "업로드 권한 확인에서 재학증명서를 등록해주세요",
+              univDept: memberData.univ?.univDept || "업로드 권한 확인에서 재학증명서를 등록해주세요",
+              bankName: memberData.userBank?.bankName || "", // ✅ DB의 은행 이름과 동일한 필드 사용
+              bankAccount: memberData.userBank?.bankAccount || "",
+              userId: memberData.userId,
+            });
+          } else {
+            throw new Error("회원 정보가 존재하지 않습니다.");
+          }
       } catch (error) {
-        console.error("회원 정보를 가져오는 데 실패했습니다:", error.message);
+        console.error("회원/은행 정보를 가져오는 데 실패했습니다:", error.message);
       }
     };
 
-    const fetchBankList = async () => {
-      try {
-        const bankData = await AuthApi.getBankList();
-        setBankList(bankData);
-      } catch (error) {
-        console.error("은행 목록을 가져오는 데 실패했습니다:", error.message);
-      }
-    };
-
-    fetchMemberInfo();
-    fetchBankList();
+    fetchData();
   }, []);
+
+
 
   const handleBankNameChange = (e) => {
     setMemberInfo({ ...memberInfo, bankName: e.target.value });
@@ -441,19 +441,37 @@ const MemberEdit = () => {
                   </Typography>
                   <Grid container spacing={2} alignItems="center">
                     <Grid item xs={12} sm={4}>
-                      <FormControl fullWidth sx={{ height: "56px" }}>
+                      <FormControl fullWidth sx={{height: "56px"}}>
                         <InputLabel shrink>은행 선택</InputLabel>
-                        <Select
-                            value={memberInfo.bankName}
-                            onChange={handleBankNameChange}
-                            sx={{ height: "56px", display: "flex", alignItems: "center" }}
+                        <select
+                            value={memberInfo.bankName || ""} // 회원의 은행이 없으면 빈 문자열
+                            onChange={(e) =>
+                                setMemberInfo({...memberInfo, bankName: e.target.value})
+                            }
+                            style={{
+                              height: "56px",
+                              width: "100%",
+                              borderRadius: "8px",
+                              padding: "8px",
+                              fontSize: "16px",
+                            }}
                         >
+                          {/* 회원의 은행이 없을 때만 "은행을 선택하세요" 표시 */}
+                          {!memberInfo.bankName && (
+                              <option value="" disabled>
+                                은행을 선택하세요
+                              </option>
+                          )}
+
+                          {/* DB에서 불러온 은행 목록 */}
                           {bankList.map((bank) => (
-                              <MenuItem key={bank.bankId} value={bank.bankName}>
+                              <option key={bank.bankId} value={bank.bankName}>
                                 {bank.bankName}
-                              </MenuItem>
+                              </option>
                           ))}
-                        </Select>
+                        </select>
+
+
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={5}>
@@ -462,7 +480,7 @@ const MemberEdit = () => {
                           value={memberInfo.bankAccount}
                           onChange={handleBankAccountChange}
                           fullWidth
-                          sx={{ height: "56px", display: "flex", alignItems: "center" }}
+                          sx={{height: "56px", display: "flex", alignItems: "center"}}
                       />
                     </Grid>
                     <Grid item xs={12} sm={3}>

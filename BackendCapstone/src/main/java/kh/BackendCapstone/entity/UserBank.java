@@ -20,7 +20,4 @@ public class UserBank {
     private String bankAccount;
     private  Long withdrawal;
 
-    @OneToOne
-    @JoinColumn(name = "member_id", unique = true) // Member와 1:1 관계
-    private Member member;
 }

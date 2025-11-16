@@ -140,9 +140,11 @@ public class MemberService {
 			member.setRevenue(newRevenue);
 			memberRepository.save(member); // 변경된 member 저장
 
-			// UserBank 엔티티에 연결된 bank 정보 저장
-			UserBank userBank = userBankRepository.findByMember_MemberId(memberId)
-					.orElseThrow(() -> new RuntimeException("연결된 계좌 정보가 없습니다."));
+			// Member를 통해 UserBank 정보 조회
+			UserBank userBank = member.getUserBank();
+			if (userBank == null) {
+				throw new RuntimeException("연결된 계좌 정보가 없습니다.");
+			}
 
 			// withdrawal 필드에 출금 금액 누적 (기존 값에 추가)
 			Long currentWithdrawal = userBank.getWithdrawal() != null ? userBank.getWithdrawal() : 0L;
@@ -224,6 +226,51 @@ public class MemberService {
 
 
 
+	
+	// 회원 정보 수정
+	public boolean updateMember(MemberReqDto memberReqDto) {
+		try {
+			Member member = memberRepository.findByEmail(memberReqDto.getEmail())
+				.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+			member.setName(memberReqDto.getName());
+			memberRepository.save(member);
+			return true;
+		} catch (Exception e) {
+			log.error("회원 정보 수정중 오류 : {}", e.getMessage());
+			return false;
+		}
+	}
+
+	public boolean updateBankInfo(Long memberId, String bankName, String bankAccount) {
+		// Member를 통해 UserBank 정보 조회
+		Member member = memberRepository.findById(memberId)
+				.orElseThrow(() -> new RuntimeException("회원 정보가 없습니다."));
+		UserBank userBank = member.getUserBank();
+
+		if (userBank != null) {
+			// 기존 UserBank 정보가 있는 경우 업데이트
+			userBank.setBankName(bankName);
+			userBank.setBankAccount(bankAccount);
+			userBankRepository.save(userBank);
+			return true;
+		} else {
+			// 기존 데이터가 없으면 새로 생성
+			UserBank newUserBank = new UserBank();
+			newUserBank.setBankName(bankName);
+			newUserBank.setBankAccount(bankAccount);
+			newUserBank.setWithdrawal(0L); // 초기 인출 금액 설정
+
+			// 먼저 UserBank 저장
+			UserBank savedUserBank = userBankRepository.save(newUserBank);
+
+			// Member에 UserBank 연결
+			member.setUserBank(savedUserBank);
+			memberRepository.save(member);
+
+			return true;
+		}
+	}
+
 	public List<MemberPermissionResDto> convertTokenToPermission(String token) {
 		// 토큰 앞에 있는 "Bearer " 제거
 		token = token.replace("Bearer ", "");
@@ -270,55 +317,6 @@ public class MemberService {
 
 		// 결과 반환 (여러 개의 DTO 반환)
 		return result;
-	}
-	
-	// 회원 정보 수정
-	public boolean updateMember(MemberReqDto memberReqDto) {
-		try {
-			Member member = memberRepository.findByEmail(memberReqDto.getEmail())
-				.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-			member.setName(memberReqDto.getName());
-			memberRepository.save(member);
-			return true;
-		} catch (Exception e) {
-			log.error("회원 정보 수정중 오류 : {}", e.getMessage());
-			return false;
-		}
-	}
-
-	public boolean updateBankInfo(Long memberId, String bankName, String bankAccount) {
-		Optional<UserBank> optionalUserBank = userBankRepository.findByMember_MemberId(memberId);
-
-		if (optionalUserBank.isPresent()) {
-			// 기존 UserBank 정보가 있는 경우 업데이트
-			UserBank userBank = optionalUserBank.get();
-			userBank.setBankName(bankName);
-			userBank.setBankAccount(bankAccount);
-			userBankRepository.save(userBank);
-			return true;
-		} else {
-			// 기존 데이터가 없으면 새로 생성
-			Optional<Member> optionalMember = memberRepository.findById(memberId);
-			if (optionalMember.isPresent()) {
-				Member member = optionalMember.get();
-
-				UserBank newUserBank = new UserBank();
-				newUserBank.setMember(member);
-				newUserBank.setBankName(bankName);
-				newUserBank.setBankAccount(bankAccount);
-				newUserBank.setWithdrawal(0L); // 초기 인출 금액 설정
-
-				// 먼저 UserBank 저장
-				UserBank savedUserBank = userBankRepository.save(newUserBank);
-
-
-				member.setUserBank(savedUserBank);
-				memberRepository.save(member);
-
-				return true;
-			}
-		}
-		return false;
 	}
 
 

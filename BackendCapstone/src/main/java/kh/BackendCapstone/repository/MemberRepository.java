@@ -4,6 +4,8 @@ package kh.BackendCapstone.repository;
 import kh.BackendCapstone.constant.Authority;
 import kh.BackendCapstone.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,4 +35,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	Optional<Member> findByMemberId(Long memberId);
 	List<Member> findAllByAuthority(Authority authority);
 	List<Member> findAllByUniv_UnivNameContaining(String univName);
+	
+	// UserBank 정보를 조인으로 함께 가져오는 메서드
+	@Query("SELECT m FROM Member m LEFT JOIN FETCH m.userBank WHERE m.memberId = :memberId")
+	Optional<Member> findByIdWithUserBank(@Param("memberId") Long memberId);
 }
