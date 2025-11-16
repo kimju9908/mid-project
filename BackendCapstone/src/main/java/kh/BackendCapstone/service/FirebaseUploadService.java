@@ -8,10 +8,9 @@ import kh.BackendCapstone.entity.Permission;
 import kh.BackendCapstone.repository.PermissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -135,21 +134,36 @@ public String uploadPermissionFile(MultipartFile file, String folderPath, String
 		String fileName = member.getMemberId() + "_" + permissionSize;
 
 		// 4) Flask API URL
-		String flaskUrl = "http://localhost:5000/spring/upload/firebase";
+		String flaskUrl = "http://localhost:5000/spring/upload/firebase/permission";
 
 		// 5) 멀티파트 데이터 생성
 		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-		body.add("file", file.getResource());
+		// 핵심 수정: InputStreamResource -> ByteArrayResource
+		byte[] bytes = file.getBytes();
+		ByteArrayResource fileResource = new ByteArrayResource(bytes) {
+			@Override
+			public String getFilename() {
+				return fileName; // Flask에서 사용할 파일명
+			}
+		};
+
+		body.add("file", fileResource);
 		body.add("folderPath", finalFolderPath);
 		body.add("fileName", fileName);
 
 		HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
 
 		// 6) Flask로 전송
-		ResponseEntity<String> response =
-				restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
+		ResponseEntity<String> response = restTemplate.exchange(
+				flaskUrl,
+				HttpMethod.POST,
+				entity,
+				String.class
+		);
 
 		log.warn("Flask 응답 결과 : {}", response);
 
@@ -160,6 +174,7 @@ public String uploadPermissionFile(MultipartFile file, String folderPath, String
 		return "파일 업로드 중 오류가 발생했습니다.";
 	}
 }
+
 
 
 }
