@@ -63,14 +63,15 @@ function App() {
 
               {/* 마이페이지 내비게이션 */}
               <Route path="myPageNavBar" element={<MyPageNavBar />}>
+                <Route index element={<MemberEdit />} />
+                <Route path="memberEdit" element={<MemberEdit />} />
+                <Route path="permission" element={<Permission />} />
+                <Route path="withdrawal" element={<Withdrawal/>}/>
                 <Route path="coverLetterRegister" element={<CoverLetterRegister />} />
                 <Route path="purchasedEnumPS" element={<PurchasedEnumPS />} />
                 <Route path="purchasedEnumSR" element={<PurchasedEnumSR />} />
                 <Route path="uploadedEnumPS" element={<UploadedEnumPS/>} />
                 <Route path="uploadedEnumSR" element={<UploadedEnumSR/>} />
-                <Route path="memberEdit" element={<MemberEdit />} />
-                <Route path="permission" element={<Permission />} />
-                <Route path="withdrawal" element={<Withdrawal/>}/>
                 <Route path="list/:category/:search/:option" element={<PostListMain active="ACTIVE" />} />
               </Route>
 

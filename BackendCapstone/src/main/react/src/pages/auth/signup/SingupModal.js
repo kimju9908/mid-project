@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef } from "react";
 import styled from "styled-components";
 import AuthApi from "../../../api/AuthApi";
 import TermsModal from "./TermsModal";
@@ -226,35 +226,65 @@ const SignupModal = ({ closeModal }) => {
     setIsModalOpen(false);
   };
 
-  let isRequestInProgress = false; // 중복 요청 방지 플래그
+
+
+  const requestInProgressRef = useRef(false);
 
   const onClickPhoneVerify = async () => {
-    if (isRequestInProgress) return; // 중복 요청 방지
-    isRequestInProgress = true;
+    if (requestInProgressRef.current) return; // 중복 요청 방지
+    requestInProgressRef.current = true;
 
     if (isPhone) {
       try {
         const resp = await AuthApi.sendVerificationCode(inputPhone);
         console.log("서버 응답:", resp);
 
-        if (resp === "true") {
-          setVerificationCode(resp.data.verificationCode);
-          setShowVerificationInput(true);
-          alert("인증번호가 발송되었습니다.");
-        } else if (resp === "EXCEED_LIMIT") {
-          setErrorMessage("5시간 후 다시 시도해주세요.");
-          alert("인증번호 발송 횟수를 초과했습니다. 5시간 후 다시 시도해주세요.");
-        } else if (resp === "false") {
-          alert("인증번호 저장에 실패했습니다.");
-        } else if (resp === "error") {
-          alert("서버 오류로 인증번호 발송에 실패했습니다.");
+        const status = resp.status; // { status: "SUCCESS" } 에서 status 추출
+
+        switch (status) {
+          case "SUCCESS":
+            setShowVerificationInput(true);
+            alert("인증번호가 발송되었습니다.");
+            setErrorMessage(""); // 에러 메시지 초기화
+            break;
+
+          case "EXCEED_LIMIT":
+            setErrorMessage("5시간 후 다시 시도해주세요.");
+            alert("인증번호 발송 횟수를 초과했습니다. 5시간 후 다시 시도해주세요.");
+            break;
+
+          case "INVALID_PHONE":
+            setErrorMessage("유효하지 않은 전화번호입니다.");
+            alert("유효하지 않은 전화번호입니다.");
+            break;
+
+          case "SAVE_FAILED":
+            setErrorMessage("인증번호 저장에 실패했습니다.");
+            alert("인증번호 저장에 실패했습니다. 다시 시도해주세요.");
+            break;
+
+          case "SMS_SEND_FAILED":
+            setErrorMessage("SMS 발송에 실패했습니다.");
+            alert("SMS 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            break;
+
+          case "FAIL":
+          default:
+            setErrorMessage("서버 오류가 발생했습니다.");
+            alert("서버 오류로 인증번호 발송에 실패했습니다. 잠시 후 다시 시도해주세요.");
+            break;
         }
+
       } catch (error) {
         console.error("인증번호 발송 요청 중 에러 발생:", error);
-        alert("서버 오류로 인증번호 발송에 실패했습니다.");
+        setErrorMessage("네트워크 오류가 발생했습니다.");
+        alert("네트워크 오류로 인증번호 발송에 실패했습니다. 인터넷 연결을 확인해주세요.");
       } finally {
-        isRequestInProgress = false; // 요청 완료 후 플래그 초기화
+        requestInProgressRef.current = false;
       }
+    } else {
+      alert("올바른 전화번호를 입력해주세요.");
+      requestInProgressRef.current = false;
     }
   };
 
@@ -526,7 +556,7 @@ const Message = styled.p`
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: center;
-   margin-top: 30px; // 가입하기 버튼과 약관 동의 사이의 간격을 넓힘
+  margin-top: 30px; // 가입하기 버튼과 약관 동의 사이의 간격을 넓힘
 `;
 
 const SignupButton = styled.button`
@@ -595,7 +625,7 @@ const TermsCheckbox = styled.input`
   border-radius: 4px;
   position: relative;
   cursor: pointer;
-  
+
   &:checked {
     background-color: #5f53d3; /* 체크되었을 때 배경색 */
     border-color: #5f53d3;

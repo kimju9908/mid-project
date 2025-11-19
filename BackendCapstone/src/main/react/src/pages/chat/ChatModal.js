@@ -165,9 +165,9 @@ const ChatModal = () => {
         <Container>
             <ChatIconBox onClick={toggleMenu}>
                 {isMenuOpen ? (
-                    <ChatIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/chat.png?alt=media"} alt="Open"/>
+                    <ChatIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fchat.png?alt=media"} alt="Open"/>
                 ) : (
-                    <ChatIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/close.png?alt=media"} alt="Close"/>
+                    <ChatIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fclose.png?alt=media"} alt="Close"/>
                 )}
             </ChatIconBox>
             <StyledSideMenu isOpen={isMenuOpen}>

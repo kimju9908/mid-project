@@ -426,13 +426,13 @@ const Main = () => {
         <Container>
             <SlideBanner className="firstBanner">
                 <BgGradient />
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FBooks.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FChatting.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FDocument.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FDownload%20Files.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FFolder.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FGraduation%20Cap.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FDocument.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fbook.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FChatting.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDocument.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDownload%20Files.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FFolder.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FGraduation%20Cap.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDocument.png?alt=media"}/>
                 <HalfBox className="first">
                     <BannerTxt>대학교 입학 가이드<br />UniGuide</BannerTxt>
                     <StartBtn>
@@ -463,7 +463,7 @@ const Main = () => {
                 <HalfBox>
                     <BgBox>
                         <BgBoxInner>
-                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FLegal.png?alt=media"} />
+                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FLegal.png?alt=media"} />
                         </BgBoxInner>
                     </BgBox>
                 </HalfBox>
@@ -486,7 +486,7 @@ const Main = () => {
                 <HalfBox>
                     <BgBox>
                         <BgBoxInner>
-                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FDownload Files.png?alt=media"} />
+                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FRecord.png?alt=media"} />
                         </BgBoxInner>
                     </BgBox>
                 </HalfBox>
@@ -500,7 +500,7 @@ const Main = () => {
                 <HalfBox>
                     <BgBox>
                         <BgBoxInner>
-                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2FChatting.png?alt=media"} />
+                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fchat2.png?alt=media"} />
                         </BgBoxInner>
                     </BgBox>
                 </HalfBox>

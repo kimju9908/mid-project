@@ -62,13 +62,19 @@ const AuthApi = {
 	findPhoneByEmail: async (phone) => {
 		return await axios.get(`${Capstone}/auth/email/${phone}`);
 	},
+
 	sendVerificationCode: async (phone) => {
-		console.log("휴대전화 번호 인증")
-		const response = await axios.post(`${Capstone}/auth/sendSms`, {
-			phone: phone,
-		})
-		console.log(response)
-		return response.data
+		console.log("휴대전화 번호 인증 요청:", phone);
+		try {
+			const response = await axios.post(`${Capstone}/auth/sendSms`, {
+				phone: phone,
+			});
+			console.log("서버 응답:", response.data);
+			return response.data; // { status: "SUCCESS" } 형태로 반환됨
+		} catch (error) {
+			console.error("API 호출 에러:", error);
+			throw error;
+		}
 	},
 
 	nickNameCheck: async (nickname) => {

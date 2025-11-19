@@ -4,6 +4,7 @@
 	import kh.BackendCapstone.dto.TokenDto;
 	import kh.BackendCapstone.dto.request.MemberReqDto;
 	import kh.BackendCapstone.dto.request.PermissionReqDto;
+	import kh.BackendCapstone.dto.request.SmsSendRequestDto;
 	import kh.BackendCapstone.dto.request.UserBankReqDto;
 	import kh.BackendCapstone.dto.response.MemberResDto;
 	import kh.BackendCapstone.entity.Bank;
@@ -20,10 +21,12 @@
 	import org.springframework.http.ResponseEntity;
 	import org.springframework.security.crypto.password.PasswordEncoder;
 	import org.springframework.web.bind.annotation.*;
-	
+
+	import java.util.HashMap;
 	import java.util.List;
-	
-	
+	import java.util.Map;
+
+
 	@Slf4j
 	@CrossOrigin(origins = "http://localhost:3000")
 	@RestController
@@ -120,14 +123,16 @@
 				this.inputToken = inputToken;
 			}
 		}
+
+
 		@PostMapping("/sendSms")
-		public ResponseEntity<String> sendSms(@RequestBody Member member) {
-			String result = smsService.sendVerificationCode(member.getPhone());
-			log.info("SMS 전송 결과: {}", ResponseEntity.ok(result));
-			return ResponseEntity.ok(result);
+		public ResponseEntity<Map<String, Object>> sendSms(@RequestBody SmsSendRequestDto dto) {
+			String result = smsService.sendVerificationCode(dto.getPhone());
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("status", result); // "SUCCESS", "EXCEED_LIMIT", "FAIL"
+			return ResponseEntity.ok(response);
 		}
-
-
 
 		// SMS 인증 토큰 검증
 		@PostMapping("/verify-sms-token")
