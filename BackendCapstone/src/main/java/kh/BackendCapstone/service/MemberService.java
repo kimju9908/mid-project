@@ -176,7 +176,8 @@ public class MemberService {
 			log.warn("Authentication 의 형태 : {}", authentication);
 			// Name 은 String 으로 되어 있기 때문에 Long으로 바꿔주는 과정이 있어야 타입이 일치
 			Long id = Long.parseLong(authentication.getName());
-			Member member = memberRepository.findById(id)
+			// UserBank 정보를 조인으로 함께 가져오기
+			Member member = memberRepository.findByIdWithUserBank(id)
 				.orElseThrow(()-> new RuntimeException("존재 하지 않는 memberId 입니다."));
 
 			// 이메일을 반환하여 클라이언트에서 처리하도록 함

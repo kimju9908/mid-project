@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import ModalLoginPage from "../pages/auth/login/ModalLoginPage";
 import MemberModal from "../pages/member/MemberMoal";
 import LoginModal from "../pages/auth/login/LoginModal";
@@ -112,14 +112,15 @@ const TopNavBar = () => {
   const isLoginModalOpen = useSelector((state) => state.modal.isLoginModalOpen);
   const isSignupModalOpen = useSelector((state) => state.modal.isSignupModalOpen);
   const isModalOpen = useSelector((state) => state.modal.isModalOpen);
-
+  
   const materialOpenModal = () => dispatch(setIsMaterialModalOpen(true)); // 입시자료 모달창 ON
   const materialCloseModal = () => dispatch(setIsMaterialModalOpen(false)); // 입시자료 모달창 OFF
 
   const IMG_URL = ["https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Flogo%2Flogo.png?alt=media"
-    , "https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fprofile%2FProfile_Purple.png?alt=media\n"]
+    , "https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fprofile%2FProfile_Purple.png?alt=media"]
 
-  // 입시자료 클릭 시 모달 닫고 페이지 전환
+
+  // 입시자료 클릭 시 모달 닫고 페이지 전환 
   const handleMaterialNavigate = (path) => {
     dispatch(setIsMaterialModalOpen(false)); // 모달 닫기
     navigate(path); // 페이지 전환
@@ -158,74 +159,74 @@ const TopNavBar = () => {
   };
 
   return (
-      <>
-        <Background>
-          <Left>
-            <img
-                src={IMG_URL[0]}
-                alt="Logo"
-                onClick={() => navigate("/")}
-            />
-            <p onClick={materialOpenModal}>입시자료</p>
-            <p onClick={() => navigate("/PersonalStatementWrite")}>자소서 작성</p>
-            <p onClick={() => navigate("/post/list/default")}>게시판</p>
-            <p onClick={() => navigate("/post/list/faq")}>FAQ</p>
-            <p onClick={() => navigate("/post/list/review")}>이용후기</p>
-          </Left>
-          <Right>
-            <img
-                src={IMG_URL[1]}
-                alt="Profile"
-                onClick={handleImageClick}
-            />
-          </Right>
-
-          {/* 모달창 */}
-          {/* 입시자료 모달창 */}
-          {isMaterialModalOpen && (
-              <MaterialModalBackground onClick={materialCloseModal}>
-                <MatrialModalContent onClick={(e) => e.stopPropagation()}>
-                  <p onClick={() => handleMaterialNavigate("/PersonalStatement")}>
-                    자기소개서
-                  </p>
-                  <p onClick={() => handleMaterialNavigate("/StudentRecord")}>
-                    생활기록부
-                  </p>
-                </MatrialModalContent>
-              </MaterialModalBackground>
-          )}
-
-          {/* 로그인 모달창 */}
-          <ModalLoginPage
-              isOpen={isModalOpen}
-              closeModal={closeModal}
-              handleModalLinkClick={handleModalLinkClick}
+    <>
+      <Background>
+        <Left>
+          <img
+            src={IMG_URL[0]}
+            alt="Logo"
+            onClick={() => navigate("/")}
           />
+          <p onClick={materialOpenModal}>입시자료</p>
+          <p onClick={() => navigate("/PersonalStatementWrite")}>자소서 작성</p>
+          <p onClick={() => navigate("/post/list/default")}>게시판</p>
+          <p onClick={() => navigate("/post/list/faq")}>FAQ</p>
+          <p onClick={() => navigate("/post/list/review")}>이용후기</p>
+        </Left>
+        <Right>
+          <img
+            src={IMG_URL[1]}
+            alt="Profile"
+            onClick={handleImageClick}
+          />
+        </Right>
 
-          {role ? (
-              <MemberModal
-                  isOpen={isModalOpen}
-                  closeModal={closeModal}
-                  handleModalLinkClick={handleModalLinkClick}
-                  isAdmin={role === "ROLE_ADMIN"}
-              />
-          ) : (
-              <ModalLoginPage
-                  isOpen={isModalOpen}
-                  closeModal={closeModal}
-                  handleModalLinkClick={handleModalLinkClick}
-              />
-          )}
+        {/* 모달창 */}
+        {/* 입시자료 모달창 */}
+        {isMaterialModalOpen && (
+          <MaterialModalBackground onClick={materialCloseModal}>
+            <MatrialModalContent onClick={(e) => e.stopPropagation()}>
+              <p onClick={() => handleMaterialNavigate("/PersonalStatement")}>
+                자기소개서
+              </p>
+              <p onClick={() => handleMaterialNavigate("/StudentRecord")}>
+                생활기록부
+              </p>
+            </MatrialModalContent>
+          </MaterialModalBackground>
+        )}
 
-          {isLoginModalOpen && (
-              <LoginModal
-                  closeModal={closeLoginModal}
-              />
-          )}
-          {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
-          <RejectModal open={reject.active} onClose={() => setReject("")} message={reject.message}></RejectModal>
-        </Background>
-      </>
+        {/* 로그인 모달창 */}
+        <ModalLoginPage
+          isOpen={isModalOpen}
+          closeModal={closeModal}
+          handleModalLinkClick={handleModalLinkClick}
+        />
+
+        {role ? (
+          <MemberModal
+            isOpen={isModalOpen}
+            closeModal={closeModal}
+            handleModalLinkClick={handleModalLinkClick}
+            isAdmin={role === "ROLE_ADMIN"}
+          />
+        ) : (
+          <ModalLoginPage
+            isOpen={isModalOpen}
+            closeModal={closeModal}
+            handleModalLinkClick={handleModalLinkClick}
+          />
+        )}
+
+        {isLoginModalOpen && (
+          <LoginModal
+            closeModal={closeLoginModal}
+          />
+        )}
+        {isSignupModalOpen && <SignupModal closeModal={closeSignupModal} />}
+        <RejectModal open={reject.active} onClose={() => setReject("")} message={reject.message}></RejectModal>
+      </Background>
+    </>
   );
 };
 

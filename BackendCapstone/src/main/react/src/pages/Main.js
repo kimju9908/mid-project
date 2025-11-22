@@ -426,13 +426,12 @@ const Main = () => {
         <Container>
             <SlideBanner className="firstBanner">
                 <BgGradient />
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fbook.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fchat2.png?alt=media"}/>
                 <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FChatting.png?alt=media"}/>
                 <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDocument.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDownload%20Files.png?alt=media"}/>
                 <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FFolder.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FGraduation%20Cap.png?alt=media"}/>
-                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDocument.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FGraduation.png?alt=media"}/>
+                <TopShape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FDocument1.png?alt=media"}/>
                 <HalfBox className="first">
                     <BannerTxt>대학교 입학 가이드<br />UniGuide</BannerTxt>
                     <StartBtn>
@@ -486,7 +485,7 @@ const Main = () => {
                 <HalfBox>
                     <BgBox>
                         <BgBoxInner>
-                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FRecord.png?alt=media"} />
+                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fbook.png?alt=media"} />
                         </BgBoxInner>
                     </BgBox>
                 </HalfBox>
@@ -500,7 +499,7 @@ const Main = () => {
                 <HalfBox>
                     <BgBox>
                         <BgBoxInner>
-                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fchat2.png?alt=media"} />
+                            <Icon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2FChatting.png?alt=media"} />
                         </BgBoxInner>
                     </BgBox>
                 </HalfBox>
@@ -519,18 +518,18 @@ const Main = () => {
                     {copyMessage && <Message>{copyMessage}</Message>}
                     <CopyButton onClick={handleCopyLink}>
                         <p>링크 복사하기</p>
-                        <ShareIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshare.png?alt=media"}/>
+                        <ShareIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshare.png?alt=media"}/>
                     </CopyButton>
                 </LastBannerInner>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape1.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape2.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape3.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape4.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape5.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape6.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape7.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape8.png?alt=media"}/>
-                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmainicon%2Fshape9.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape1.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape2.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape3.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape4.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape5.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape6.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape7.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape8.png?alt=media"}/>
+                <Shape src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fmain%2Fshape9.png?alt=media"}/>
             </LastBanner>
         </Container>
     );

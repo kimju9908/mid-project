@@ -10,7 +10,7 @@ const Permission = () => {
   const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
   const fileInputRef = useRef(null); // 파일 선택 input 참조
 
-  // 🔹 DB에서 사용자 정보 가져오기
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -26,13 +26,11 @@ const Permission = () => {
     fetchData();
   }, []);
 
-  // 🔹 파일 선택 핸들러
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
   };
 
-  // 🔹 파일 업로드 API
   const handleUpload = async () => {
     if (!selectedFile) {
       setUploadStatus("업로드할 파일을 선택하세요.");
@@ -106,13 +104,12 @@ const Permission = () => {
         </Table>
       </TableContainer>
 
-      {/* 안내 문구 */}
       <Typography variant="body2" sx={{ marginTop: 3, color: "gray", textAlign: "center" }}>
         합격 증명서를 업로드 하시면 더 많은 자료를 업로드할 수 있습니다. <br />
         관리자 승인 후 파일 업로드 가능하며 승인까지는 최대 3일 소요될 수 있습니다.
       </Typography>
 
-      {/* 파일 업로드 박스 */}
+
       <Box
         sx={{
           padding: 4,
