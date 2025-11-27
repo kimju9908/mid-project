@@ -148,7 +148,7 @@ const LoginModal = ({ closeModal }) => {
           <SnsLoginText>SNS 계정 간편 로그인</SnsLoginText>
           <SocialButtonsContainer>
             <NaverButton onClick={() => onSnsSignInButtonClickHandler('naver')}>
-              <LogoImg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/.png?alt=media"}/>
+              <LogoImg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/naver.png?alt=media"}/>
               <p>네이버 로그인</p>
             </NaverButton>
             <KakaoButton onClick={() => onSnsSignInButtonClickHandler('kakao')}>

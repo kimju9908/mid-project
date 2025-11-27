@@ -63,17 +63,21 @@ public class AdminService {
 	}
 	@Transactional
 	public boolean activatePermission(Long permissionId, Long univId, boolean isUniv) {
-		try{
+		try {
 			Permission permission = permissionRepository.findByPermissionId(permissionId)
-				.orElseThrow(() -> new RuntimeException("해당 권한 설정이 없습니다."));
+					.orElseThrow(() -> new RuntimeException("해당 권한 설정이 없습니다."));
 			Univ univ = univRepository.findById(univId)
-				.orElseThrow(() -> new RuntimeException("해당 대학이 존재하지 않습니다."));
+					.orElseThrow(() -> new RuntimeException("해당 대학이 존재하지 않습니다."));
+
+			// Permission 활성화 및 대학 설정
 			permission.setActive(Active.ACTIVE);
 			permission.setActiveDate(LocalDateTime.now());
 			permission.setUniv(univ);
+
 			if (isUniv) {
 				Member member = permission.getMember();
 				member.setUniv(univ);
+				member.setAuthority(Authority.valueOf("ROLE_UNIV")); // 권한 변경 추가
 				memberRepository.save(member);
 			}
 			log.warn("권한 설정 변경 : {}", permission);
@@ -83,6 +87,7 @@ public class AdminService {
 			return false;
 		}
 	}
+
 	public boolean permissionSave(Permission permission) {
 		try {
 			Permission savedPermission = permissionRepository.save(permission);
@@ -325,40 +330,62 @@ public class AdminService {
 			return ResponseEntity.status(500).body(null); // 500 Internal Server Error
 		}
 	}
-	
+
 	public PermissionResDto convertEntityToDto(Permission permission) {
 		PermissionResDto dto = new PermissionResDto();
 		dto.setPermissionId(permission.getPermissionId());
-		dto.setUnivName(permission.getUniv().getUnivName());
-		dto.setUnivDept(permission.getUniv().getUnivDept());
+
+		// Univ가 null인지 체크
+		if (permission.getUniv() != null) {
+			dto.setUnivName(permission.getUniv().getUnivName());
+			dto.setUnivDept(permission.getUniv().getUnivDept());
+		} else {
+			dto.setUnivName(null); // 혹은 "알 수 없음" 등 기본값
+			dto.setUnivDept(null);
+		}
+
+		// Member는 기본적으로 존재한다고 가정
 		dto.setMemberId(permission.getMember().getMemberId());
 		dto.setName(permission.getMember().getName());
 		dto.setNickname(permission.getMember().getNickName());
 		dto.setAuthority(permission.getMember().getAuthority());
+
 		dto.setActive(permission.getActive());
 		dto.setPermissionUrl(permission.getPermissionUrl());
 		dto.setRegDate(permission.getRegDate());
 		dto.setActiveDate(permission.getActiveDate());
 		return dto;
 	}
+
+
+
 	public List<PermissionResDto> convertEntityToDtoList(List<Permission> permissionList) {
 		List<PermissionResDto> dtoList = new ArrayList<>();
+
 		for (Permission permission : permissionList) {
 			PermissionResDto dto = new PermissionResDto();
 			dto.setActive(permission.getActive());
-			dto.setUnivName(permission.getUniv().getUnivName());
-			dto.setUnivDept(permission.getUniv().getUnivDept());
 			dto.setNickname(permission.getMember().getNickName());
 			dto.setMemberId(permission.getMember().getMemberId());
 			dto.setPermissionId(permission.getPermissionId());
 			dto.setAuthority(permission.getMember().getAuthority());
 			dto.setRegDate(permission.getRegDate());
 			dto.setActiveDate(permission.getActiveDate());
+
+			// 🔥 핵심: Univ null 체크
+			if (permission.getUniv() != null) {
+				dto.setUnivName(permission.getUniv().getUnivName());
+				dto.setUnivDept(permission.getUniv().getUnivDept());
+			} else {
+				dto.setUnivName(null);
+				dto.setUnivDept(null);
+			}
+
 			dtoList.add(dto);
 		}
 		return dtoList;
 	}
-	
+
 	private AdminMemberResDto convertMemberToDto(Member member) {
 		AdminMemberResDto dto = new AdminMemberResDto();
 		dto.setAuthority(member.getAuthority());
