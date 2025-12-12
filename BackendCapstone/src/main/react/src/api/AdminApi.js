@@ -69,6 +69,16 @@ const AdminApi = {
 				console.log("코딩 에러")
 				return null;
 		}
+	},
+	
+	getSettlementList: () => {
+		console.log("정산 목록 조회");
+		return AxiosInstance.get(baseUrl + `/admin/settlement/list`);
+	},
+	
+	processSettlement: (userBankId) => {
+		console.log(`정산 처리 : userBankId=${userBankId}`);
+		return AxiosInstance.post(baseUrl + `/admin/settlement/process/${userBankId}`);
 	}
 }
 export default AdminApi;

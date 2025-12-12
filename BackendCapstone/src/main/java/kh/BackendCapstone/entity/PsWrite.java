@@ -18,6 +18,7 @@ import java.util.List;
 public class PsWrite {
 	// 자기소개서 id
     @Id
+	@Column(name = "ps_id")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long psWriteId;
 

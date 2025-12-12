@@ -27,7 +27,6 @@
 		import java.util.List;
 		// 스프링게 조금 더 낫다
 
-
 		@Slf4j  // 로그 정보를 출력하기 위함
 		@Service    // 스프링 컨테이너에 빈(객체) 등록
 		@RequiredArgsConstructor    // 생성자 생성
@@ -85,32 +84,22 @@
 					if (member.getMembership() == Membership.SECESSION) {
 						// 탈퇴된 회원일 경우 예외 처리
 						throw new RuntimeException("탈퇴한 회원입니다.");
-
 					}
-
 					UsernamePasswordAuthenticationToken authenticationToken = memberReqDto.toAuthentication();
 					log.info("authenticationToken : {}", authenticationToken);
 
 					Authentication authentication = managerBuilder.getObject().authenticate(authenticationToken);
 					log.info("authentication : {}", authentication);
 
-
 					TokenDto token = tokenProvider.generateTokenDto(authentication);
-
 					//refreshToken DB에 저장
-
-					
 					refreshTokenSave(member, token);
-					
 					return token;
-
 				} catch (Exception e) {
 					log.error("로그인 중 에러 발생 : ", e);
 					throw new RuntimeException("로그인 중 에러 발생", e);
 				}
-
 			}
-
 			public AccessTokenDto refreshAccessToken(String refreshToken) {
 				log.info("일반refreshExist : {}", refreshTokenRepository.existsByRefreshToken(refreshToken));
 				//DB에 일치하는 refreshToken이 있으면

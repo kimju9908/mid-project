@@ -69,6 +69,7 @@ const AdminNav = () => {
 		{ name: "권한 부여 페이지", id: "auth", link: "/admin/auth" },
 		{ name: "게시글 관리 페이지", id: "board", link: "/admin/board/default" },
 		{ name: "회원 관리 페이지", id: "member", link: "/admin/member/default/0" },
+		{ name: "수익금 정산 페이지", id: "settlement", link: "/admin/settlement" },
 	];
 	const [reject, setReject] = useState({});
 	const role = useSelector(state => state.persistent.role)

@@ -4,6 +4,7 @@ package kh.BackendCapstone.controller;
 import kh.BackendCapstone.dto.request.AdminMemberReqDto;
 import kh.BackendCapstone.dto.response.AdminMemberResDto;
 import kh.BackendCapstone.dto.response.PermissionResDto;
+import kh.BackendCapstone.dto.response.SettlementResDto;
 import kh.BackendCapstone.dto.response.TextBoardListResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.entity.Univ;
@@ -100,6 +101,18 @@ public class AdminController {
 	public ResponseEntity<List<Boolean>> uploadBank(@RequestParam("file") MultipartFile file,
 	                                                     @RequestHeader("Authorization") String token) {
 		return adminService.convertCsvToBank(file, token);
+	}
+	
+	@GetMapping("/settlement/list")
+	public ResponseEntity<List<SettlementResDto>> getSettlementList() {
+		List<SettlementResDto> settlementList = adminService.getSettlementList();
+		return ResponseEntity.ok(settlementList);
+	}
+	
+	@PostMapping("/settlement/process/{userBankId}")
+	public ResponseEntity<Boolean> processSettlement(@PathVariable Long userBankId) {
+		boolean isSuccess = adminService.processSettlement(userBankId);
+		return ResponseEntity.ok(isSuccess);
 	}
 	
 	

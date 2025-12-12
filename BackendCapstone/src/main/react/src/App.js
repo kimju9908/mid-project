@@ -39,6 +39,7 @@ import MemberControlMain from "./pages/admin/member/list/MemberControlMain";
 import BoardControlMain from "./pages/admin/board/BoardControlMain";
 import MemberItemDetail from "./pages/admin/member/item/MemberItemDetail";
 import AdminMain from "./pages/admin/AdminMain";
+import SettlementMain from "./pages/admin/settlement/SettlementMain";
 import Main from "./pages/Main";
 import Terms from "./styles/Terms";
 
@@ -88,6 +89,7 @@ function App() {
                 <Route path="member/:searchOption/:searchValue" element={<MemberControlMain/>} />
                 <Route path="member/detail/:id" element={<MemberItemDetail/>}/>
                 <Route path="board/:category/:search?/:option?" element={<BoardControlMain/>}/>
+                <Route path="settlement" element={<SettlementMain/>}/>
               </Route>
 
               {/* 게시판 (text Board) */}

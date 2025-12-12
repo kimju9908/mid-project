@@ -99,14 +99,16 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 		.anyRequest().authenticated()
 		.and()
+
 		.oauth2Login(oauth2 -> oauth2
 			.authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
 			.redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
 			.userInfoEndpoint(endpoint -> endpoint.userService(oauth2UserService))
 			.successHandler(oAuth2SuccessHandler)
+
 		)
 		.apply(new JwtSecurityConfig(tokenProvider));
-	
+
 	return http.build();
 	}
 }

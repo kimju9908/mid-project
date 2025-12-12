@@ -8,6 +8,7 @@ import kh.BackendCapstone.dto.request.AdminMemberReqDto;
 import kh.BackendCapstone.dto.request.UnivReqDto;
 import kh.BackendCapstone.dto.response.AdminMemberResDto;
 import kh.BackendCapstone.dto.response.PermissionResDto;
+import kh.BackendCapstone.dto.response.SettlementResDto;
 import kh.BackendCapstone.dto.response.TextBoardListResDto;
 import kh.BackendCapstone.entity.*;
 import kh.BackendCapstone.repository.*;
@@ -39,6 +40,7 @@ public class AdminService {
 	private final MemberService memberService;
 	private final UnivService univService;
 	private final BankRepository bankRepository;
+	private final UserBankRepository userBankRepository;
 	
 	public PermissionResDto getPermission(Long id) {
 		try {
@@ -401,5 +403,57 @@ public class AdminService {
 		dto.setWithdrawal(member.getUserBank().getWithdrawal());
 		dto.setRevenue(member.getRevenue());
 		return dto;
+	}
+	
+	// 정산 목록 조회 (withdrawal > 0인 UserBank를 가진 Member 목록)
+	public List<SettlementResDto> getSettlementList() {
+		try {
+			List<Member> members = memberRepository.findAllByUserBankWithdrawalGreaterThanZero();
+			List<SettlementResDto> settlementList = new ArrayList<>();
+			
+			for (Member member : members) {
+				if (member.getUserBank() != null && member.getUserBank().getWithdrawal() != null 
+						&& member.getUserBank().getWithdrawal() > 0) {
+					SettlementResDto dto = new SettlementResDto();
+					dto.setUserBankId(member.getUserBank().getUserBankId());
+					dto.setMemberId(member.getMemberId());
+					dto.setMemberName(member.getName());
+					dto.setBankName(member.getUserBank().getBankName());
+					dto.setBankAccount(member.getUserBank().getBankAccount());
+					dto.setWithdrawal(member.getUserBank().getWithdrawal());
+					settlementList.add(dto);
+				}
+			}
+			
+			log.warn("정산 목록 조회 결과 : {}개", settlementList.size());
+			return settlementList;
+		} catch (Exception e) {
+			log.error("정산 목록 조회 중 오류 발생 : {}", e.getMessage(), e);
+			return new ArrayList<>();
+		}
+	}
+	
+	// 정산 처리 (withdrawal을 0으로 설정)
+	@Transactional
+	public boolean processSettlement(Long userBankId) {
+		try {
+			UserBank userBank = userBankRepository.findById(userBankId)
+					.orElseThrow(() -> new RuntimeException("해당 계좌 정보가 없습니다."));
+			
+			if (userBank.getWithdrawal() == null || userBank.getWithdrawal() <= 0) {
+				log.warn("정산할 금액이 없습니다. userBankId: {}", userBankId);
+				return false;
+			}
+			
+			Long previousWithdrawal = userBank.getWithdrawal();
+			userBank.setWithdrawal(0L);
+			userBankRepository.save(userBank);
+			
+			log.warn("정산 완료 : userBankId={}, 기존 withdrawal={}", userBankId, previousWithdrawal);
+			return true;
+		} catch (Exception e) {
+			log.error("정산 처리 중 오류 발생 : {}", e.getMessage(), e);
+			return false;
+		}
 	}
 }

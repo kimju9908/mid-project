@@ -39,4 +39,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	// UserBank 정보를 조인으로 함께 가져오는 메서드
 	@Query("SELECT m FROM Member m LEFT JOIN FETCH m.userBank WHERE m.memberId = :memberId")
 	Optional<Member> findByIdWithUserBank(@Param("memberId") Long memberId);
+	
+	// withdrawal > 0인 UserBank를 가진 Member 조회
+	@Query("SELECT m FROM Member m JOIN FETCH m.userBank ub WHERE ub.withdrawal > 0")
+	List<Member> findAllByUserBankWithdrawalGreaterThanZero();
 }

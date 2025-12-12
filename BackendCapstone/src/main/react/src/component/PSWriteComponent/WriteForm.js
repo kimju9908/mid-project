@@ -338,7 +338,7 @@ const WriteForm = () => {
     // 처음 화면이 나타나는 시점에 서버로부터 정보를 가져옴
     useEffect(() => {
         loadPsWrite(id);
-    }, [id, role]);
+    }, [id]);
 
     // 상태 변경 확인 (렌더링 문제 디버깅)
     useEffect(() => {
@@ -361,9 +361,9 @@ const WriteForm = () => {
     };
 
     // memberId와 관련된 자기소개서 목록 가져오기
-    const fetchPsForUser = async (memberId) => {
+    const fetchPsForUser = async () => {
         try {
-            const pswrites = await PsWriteApi.getMyPs(memberId);
+            const pswrites = await PsWriteApi.getPsList();
             console.log("Fetched Personal Statement for Member:", pswrites);
             setPsWrites(pswrites);
         } catch (error) {
