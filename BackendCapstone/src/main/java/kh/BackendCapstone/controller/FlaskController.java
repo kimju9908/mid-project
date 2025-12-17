@@ -27,8 +27,8 @@ public class FlaskController {
 	private final FlaskService flaskService;
 	
 	@PostMapping("/ai/ps")
-	public ResponseEntity<Boolean> postAi(@RequestBody AiReqDto aiReqDto, @RequestHeader("Authorization") String token) {
-		boolean rsp = flaskService.postAi(aiReqDto, token);
+	public ResponseEntity<Boolean> postAi(@RequestBody AiReqDto aiReqDto) {
+		boolean rsp = flaskService.postAi(aiReqDto);
 		return ResponseEntity.ok(rsp);
 	}
 	

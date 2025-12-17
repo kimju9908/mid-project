@@ -161,9 +161,9 @@ public class FileBoardService {
 		}
 	}
 	
-	public FileBoardResDto getBoard(Long boardId, String token) {
+	public FileBoardResDto getBoard(Long boardId) {
 		Member member = null;
-		if(!Objects.equals(token, "")) member = memberService.convertTokenToEntity(token);
+		member = memberService.convertTokenToEntity();
 		
 		FileBoard fileBoard = fileBoardRepository.findById(boardId)
 			.orElseThrow(() -> new RuntimeException("해당 품목이 없습니다."));

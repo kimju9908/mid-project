@@ -35,36 +35,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {  // WebMvcConfigure
 		return new BCryptPasswordEncoder();  // BCryptPasswordEncoder 사용하여 비밀번호 암호화
 	}
 
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//		http
-//				.httpBasic() // HTTP 기본 인증
-//				.and()
-//				.csrf().disable() // CSRF 비활성화
-//				.sessionManagement()
-//				.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // 세션이 필요할 때 생성
-//				.and()
-//				.exceptionHandling()
-//				.authenticationEntryPoint(jwtAuthenticationEntryPoint) // 인증 실패 처리
-//				.accessDeniedHandler(jwtAccessDeniedHandler) // 인가 실패 처리
-//				.and()
-//				.authorizeRequests()
-//				.antMatchers("/", "/static/**", "/auth/**", "/ws/**", "/oauth2/**", "/api/v1/auth/**", "/api/v1/payments/**", "/chat/**", "/flask/**", "/file/**", "/univ/**").permitAll()
-//				.antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception").permitAll()
-//				.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-//				.antMatchers("/favicon.ico", "/manifest.json").permitAll()
-//				.anyRequest().authenticated() // 나머지 요청은 인증 필요
-//				.and()
-//				.oauth2Login(oauth2 -> oauth2
-//						.authorizationEndpoint(endpoint -> endpoint.baseUri("/api/v1/auth/oauth2"))
-//						.redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
-//						.userInfoEndpoint(endpoint -> endpoint.userService(oauth2UserService))
-//						.successHandler(oAuth2SuccessHandler)
-//				)
-//				.apply(new JwtSecurityConfig(tokenProvider)); // JWT 인증 설정
-//
-//		return http.build();
-//	}
 @Bean
 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	http

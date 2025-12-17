@@ -35,11 +35,6 @@ public class SmsService {
         this.smsAuthTokenRepository = smsAuthTokenRepository;
     }
 
-    /**
-     * 인증번호를 전송하는 메서드
-     * @param phone 전화번호
-     * @return "SUCCESS", "EXCEED_LIMIT", "INVALID_PHONE", "SAVE_FAILED", "SMS_SEND_FAILED", "FAIL"
-     */
     public String sendVerificationCode(String phone) {
         try {
             // 1) 전화번호 유효성 검증
@@ -47,19 +42,16 @@ public class SmsService {
                 logger.warn("유효하지 않은 전화번호");
                 return "INVALID_PHONE";
             }
-
             // 2) 요청 횟수 제한 체크
             if (isExceedLimit(phone)) {
                 logger.warn("인증 요청 초과: {}", phone);
                 return "EXCEED_LIMIT";
             }
-
             // 3) 인증번호 생성
             String verificationCode = generateSixDigitCode();
 
             // 4) 인증번호 먼저 저장 (문자 발송 전)
             saveVerificationCode(phone, verificationCode);
-
             // 5) 저장 검증
             boolean isSaved = smsAuthTokenRepository.findByPhone(phone)
                     .map(token -> token.getToken().equals(verificationCode))
@@ -69,30 +61,24 @@ public class SmsService {
                 logger.error("인증번호 저장 실패 - 전화번호: {}", phone);
                 return "SAVE_FAILED";
             }
-
             // 6) 문자 발송
             try {
                 Message message = new Message();
                 message.setFrom("01052218948");
                 message.setTo(phone);
                 message.setText("[본인인증] 인증번호: " + verificationCode);
-
                 messageService.send(message);
                 logger.info("인증번호 발송 성공 - 전화번호: {}, 코드: {}", phone, verificationCode);
-
             } catch (Exception smsException) {
                 logger.error("SMS 발송 실패 - 전화번호: {}, 오류: {}", phone, smsException.getMessage());
                 // 발송 실패 시 저장된 인증번호 삭제 고려
                 // smsAuthTokenRepository.deleteByPhone(phone);
                 return "SMS_SEND_FAILED";
             }
-
             // 7) 요청 횟수 증가 및 제한 시간 설정
             requestCountMap.put(phone, requestCountMap.getOrDefault(phone, 0) + 1);
             resetRequestCountAfterDelay(phone);
-
             return "SUCCESS";
-
         } catch (Exception e) {
             logger.error("인증번호 발송 처리 중 오류 발생 - 전화번호: {}, 오류: {}", phone, e.getMessage(), e);
             return "FAIL";
@@ -106,7 +92,6 @@ public class SmsService {
         int code = (int) (Math.random() * 900000) + 100000; // 100000 ~ 999999 사이의 숫자 생성
         return String.valueOf(code);
     }
-
     // 인증번호를 DB에 저장하는 메서드
     @Transactional
     public void saveVerificationCode(String phone, String verificationCode) {

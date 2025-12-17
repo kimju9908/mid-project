@@ -63,17 +63,21 @@ public class FirebaseUploadService {
 		}
 	}
 @Transactional
-public String uploadPermissionFile(MultipartFile file, String folderPath, String token) {
+public String uploadPermissionFile(MultipartFile file, String folderPath) {
 	try {
 		// 1) 토큰으로 멤버 조회
-		Member member = memberService.convertTokenToEntity(token);
+		Member member = memberService.convertTokenToEntity();
+
 		// 2) 동적 폴더 경로 생성
 		String finalFolderPath = "firebase/" + folderPath + "/" + member.getMemberId();
+
 		// 3) 파일명 생성
 		int permissionSize = permissionRepository.countAllByMember(member);
 		String fileName = member.getMemberId() + "_" + permissionSize;
+
 		// 4) Flask API URL
-		String flaskUrl = "http://localhost:5000/spring/upload/firebase";
+		String flaskUrl = "http://localhost:5000/spring/upload/firebase/permission";
+
 		// 5) 멀티파트 데이터 생성
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -88,6 +92,7 @@ public String uploadPermissionFile(MultipartFile file, String folderPath, String
 				return fileName; // Flask에서 사용할 파일명
 			}
 		};
+
 		body.add("file", fileResource);
 		body.add("folderPath", finalFolderPath);
 		body.add("fileName", fileName);
@@ -101,11 +106,15 @@ public String uploadPermissionFile(MultipartFile file, String folderPath, String
 				String.class
 		);
 		log.warn("Flask 응답 결과 : {}", response);
+
 		return response.getBody();
+
 	} catch (Exception e) {
 		log.error("파일 업로드 중 오류 발생: ", e);
 		return "파일 업로드 중 오류가 발생했습니다.";
-		}
 	}
+}
+
+
 
 }

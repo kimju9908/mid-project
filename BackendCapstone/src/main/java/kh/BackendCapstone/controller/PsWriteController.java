@@ -23,7 +23,7 @@ public class PsWriteController {
     private final PsWriteService psWriteService;
 
     @PostMapping("/save/{psWriteId}")
-    public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto, @PathVariable Long psWriteId, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<PsWriteResDto> savePsWrite(@RequestBody PsWriteDto psWriteDto, @PathVariable Long psWriteId) {
         try {
             // psWriteDto에서 PsWriteReqDto와 List<PsContentsReqDto> 추출
             PsWriteReqDto psWriteReqDto = psWriteDto.getPsWriteReqDto();
@@ -33,7 +33,7 @@ public class PsWriteController {
             log.info("Received request to save PsWrite: {}", psWriteDto);
 
             // 서비스 호출
-            PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList, token);
+            PsWriteResDto psWriteResDto = psWriteService.savePsWrite(psWriteReqDto, contentsReqDtoList);
             return ResponseEntity.ok(psWriteResDto);
         } catch (Exception e) {
             log.error("Failed to save PsWrite", e);
@@ -41,13 +41,13 @@ public class PsWriteController {
         }
     }
     @GetMapping("/load/{psWriteId}")
-    public ResponseEntity<PsWriteResDto> loadPsWrite(@PathVariable Long psWriteId, @RequestHeader("Authorization") String token) {
-        PsWriteResDto psWriteResDto = psWriteService.loadPsWrite(psWriteId, token);
+    public ResponseEntity<PsWriteResDto> loadPsWrite(@PathVariable Long psWriteId) {
+        PsWriteResDto psWriteResDto = psWriteService.loadPsWrite(psWriteId);
         return (psWriteResDto != null) ? ResponseEntity.ok(psWriteResDto) : ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
     }
     @GetMapping("/make")
-    public ResponseEntity<Long> makePsWrite(@RequestHeader("Authorization") String token) {
-        Long psWriteId = psWriteService.newPsWrite(token);
+    public ResponseEntity<Long> makePsWrite() {
+        Long psWriteId = psWriteService.newPsWrite();
         return ResponseEntity.ok(psWriteId);
     }
 
@@ -62,8 +62,8 @@ public class PsWriteController {
     }*/
 
     @GetMapping("/list/get")
-    public ResponseEntity<List<PsWriteListResDto>> getPsWriteList(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(psWriteService.getPsWriteList(token));
+    public ResponseEntity<List<PsWriteListResDto>> getPsWriteList() {
+        return ResponseEntity.ok(psWriteService.getPsWriteList());
     }
 
     // 자기소개서 삭제

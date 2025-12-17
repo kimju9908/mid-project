@@ -193,10 +193,10 @@ public class FlaskService {
 	}
 	
 	@Transactional
-	public boolean postAi(AiReqDto aiReqDto, String token) {
+	public boolean postAi(AiReqDto aiReqDto) {
 		try {
 			// 1. 회원 정보 가져오기
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			
 			// 2. 자소서 정보 가져오기
 			PsContents psContents = psContentsRepository.findByPsContentsId(aiReqDto.getPsContentsId())

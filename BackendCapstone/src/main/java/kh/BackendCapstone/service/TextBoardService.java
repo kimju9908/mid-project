@@ -35,9 +35,9 @@ public class TextBoardService {
 	
 	// 게시글 등록
 	@Transactional // 일련의 과정중에 오류가 하나라도 생기면 롤백됨
-	public boolean saveBoard(TextBoardReqDto textBoardReqDto, String token) {
+	public boolean saveBoard(TextBoardReqDto textBoardReqDto) {
 		try {
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			TextBoard textBoard = textBoardRepository.findByTextId(textBoardReqDto.getTextId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
 			textBoard.setTitle(textBoardReqDto.getTitle());
@@ -51,9 +51,9 @@ public class TextBoardService {
 		}
 	}
 	@Transactional // 일련의 과정중에 오류가 하나라도 생기면 롤백됨
-	public Long createBoard(TextBoardReqDto textBoardReqDto, String token) {
+	public Long createBoard(TextBoardReqDto textBoardReqDto) {
 		try {
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if(member == null) {return null;}
 			TextBoard textBoard = new TextBoard();
 			textBoard.setActive(Active.ACTIVE);
@@ -79,11 +79,11 @@ public class TextBoardService {
 			return null;
 		}
 	}
-	public TextBoardResDto loadByBoardId (Long id, String token) {
+	public TextBoardResDto loadByBoardId (Long id) {
 		try {
 			TextBoard textBoard = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			return (member.equals(textBoard.getMember())) ? boardToBoardResDto(textBoard) : null;
 		} catch (Exception e) {
 			log.error("게시글 불러오기 중 오류 : {}",e.getMessage());
@@ -234,11 +234,11 @@ public class TextBoardService {
 	
 	// 게시글 수정
 	@Transactional
-	public boolean updateBoard(TextBoardReqDto textBoardReqDto, String token) {
+	public boolean updateBoard(TextBoardReqDto textBoardReqDto) {
 		try{
 			TextBoard textBoard = textBoardRepository.findByTextId(textBoardReqDto.getTextId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if(member.equals(textBoard.getMember())) {
 				textBoard.setTitle(textBoardReqDto.getTitle());
 				textBoard.setContent(textBoardReqDto.getContent());
@@ -254,11 +254,11 @@ public class TextBoardService {
 	}
 	
 	// 게시글 삭제 = Active 를 INACTIVE 로 설정
-	public boolean deleteBoard(Long id, String token) {
+	public boolean deleteBoard(Long id) {
 		try {
 			TextBoard board = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 존재하지 않습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if(member.equals(board.getMember())) {
 				board.setActive(Active.INACTIVE);
 				textBoardRepository.save(board);
@@ -271,11 +271,11 @@ public class TextBoardService {
 			return false;
 		}
 	}
-	public String isAuthor(Long id, String token) {
+	public String isAuthor(Long id) {
 		try {
 			TextBoard board = textBoardRepository.findByTextId(id)
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 없습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if (board.getMember().equals(member)) {
 				return "/post/create/" + board.getTextCategory() + "/" + board.getTextId();
 			}
@@ -286,11 +286,11 @@ public class TextBoardService {
 		}
 	}
 	@Transactional
-	public boolean createComment(CommentReqDto commentReqDto, String token) {
+	public boolean createComment(CommentReqDto commentReqDto) {
 		try{
 			TextBoard textBoard = textBoardRepository.findByTextId(commentReqDto.getBoardId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 없습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			Comment comment = new Comment();
 			comment.setContent(commentReqDto.getContent());
 			comment.setMember(member);
@@ -304,11 +304,11 @@ public class TextBoardService {
 		}
 	}
 	
-	public boolean deleteComment(CommentReqDto dto, String token) {
+	public boolean deleteComment(CommentReqDto dto) {
 		try{
 			TextBoard textBoard = textBoardRepository.findByTextId(dto.getBoardId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 없습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			Comment comment = commentRepository.findByCommentId(dto.getCommentId())
 				.orElseThrow(() -> new RuntimeException("해당 댓글이 존재하지 않습니다."));
 			if(!comment.getMember().equals(member)) throw new RuntimeException("해당 댓글의 작성자가 아닙니다.");
@@ -322,11 +322,11 @@ public class TextBoardService {
 		}
 	}
 	
-	public boolean updateComment(CommentReqDto commentReqDto, String token) {
+	public boolean updateComment(CommentReqDto commentReqDto) {
 		try{
 			TextBoard textBoard = textBoardRepository.findByTextId(commentReqDto.getBoardId())
 				.orElseThrow(() -> new RuntimeException("해당 게시글이 없습니다."));
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			Comment comment = commentRepository.findByCommentId(commentReqDto.getCommentId())
 				.orElseThrow(() -> new RuntimeException("해당 댓글이 존재하지 않습니다."));
 			if(!comment.getMember().equals(member)) throw new RuntimeException("해당 댓글의 작성자가 아닙니다.");
@@ -340,9 +340,9 @@ public class TextBoardService {
 		}
 	}
 	
-	public List<CommentResDto> getCommentList(Long boardId, int page, int size, String token) {
+	public List<CommentResDto> getCommentList(Long boardId, int page, int size) {
 		try{
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			
 			PageRequest pageRequest = PageRequest.of(page, size);
 			TextBoard textBoard = textBoardRepository.findByTextId(boardId)

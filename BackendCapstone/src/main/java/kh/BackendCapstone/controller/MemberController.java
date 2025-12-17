@@ -4,6 +4,7 @@ import kh.BackendCapstone.dto.request.MemberReqDto;
 import kh.BackendCapstone.dto.response.MemberPermissionResDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
 import kh.BackendCapstone.entity.Member;
+import kh.BackendCapstone.security.SecurityUtil;
 import kh.BackendCapstone.service.AuthService;
 import kh.BackendCapstone.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +44,9 @@ public class MemberController {
 		return ResponseEntity.ok(memberResDto);
 	}
 	@GetMapping("/nickName")
-	public ResponseEntity<String> getEmailFromToken(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> getEmailFromToken() {
 		try {
-			String nickName = memberService.convertTokenToEntity(token).getNickName();
+			String nickName = memberService.convertTokenToEntity().getNickName();
 			return ResponseEntity.ok(nickName);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
@@ -61,9 +62,9 @@ public class MemberController {
 	}
 
 	@GetMapping("/memberId")
-	public ResponseEntity<Long> getMemberIdFromToken(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<Long> getMemberIdFromToken() {
 		try {
-			Long memberId = memberService.convertTokenToEntity(token).getMemberId();
+			Long memberId = memberService.convertTokenToEntity().getMemberId();
 			return ResponseEntity.ok(memberId);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Long.valueOf("Invalid token"));
@@ -71,23 +72,23 @@ public class MemberController {
 	}
 
 	@GetMapping("/deleteUser")
-	public ResponseEntity<Boolean> deleteMember(@RequestHeader("Authorization") String token ) {
-		Long memberId = memberService.getMemberId(token);
+	public ResponseEntity<Boolean> deleteMember( ) {
+		Long memberId = SecurityUtil.getCurrentMemberId();
 		boolean isSuccess = memberService.deleteMember(memberId);
 		log.info("삭제 성공 여부 : {}", isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
 	// 받는거
 	@GetMapping("/role")
-	public ResponseEntity<String> isRole(@RequestHeader("Authorization") String token) {
-		String role = memberService.getRole(token);
+	public ResponseEntity<String> isRole() {
+		String role = memberService.getRole();
 		return ResponseEntity.ok(role);
 	}
 
 	@GetMapping("/revenue")
-	public ResponseEntity<Integer> getRevenue(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<Integer> getRevenue() {
 		try {
-			int revenue = memberService.getRevenue(token);
+			int revenue = memberService.getRevenue();
 			return ResponseEntity.ok(revenue);
 		} catch (Exception e) {
 			// 예외 로깅
@@ -96,11 +97,10 @@ public class MemberController {
 		}
 	}
 	@GetMapping("/saveRevenue")
-	public ResponseEntity<String> saveRevenue(@RequestParam Long profit,
-											  @RequestHeader("Authorization") String token) {
+	public ResponseEntity<String> saveRevenue(@RequestParam Long profit) {
 		try {
 			// 서비스 계층의 saveRevenue 호출
-			memberService.saveRevenue(profit, token);
+			memberService.saveRevenue(profit);
 
 			return ResponseEntity.ok("수익금이 정상적으로 처리되었습니다.");
 		} catch (Exception e) {
@@ -110,10 +110,9 @@ public class MemberController {
 	}
 
 	@GetMapping("/details")
-	public ResponseEntity<Member> getMemberDetails(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<Member> getMemberDetails() {
 		try {
-			String actualToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-			Member member = memberService.convertTokenToEntity(actualToken);
+			Member member = memberService.convertTokenToEntity();
 			return ResponseEntity.ok(member);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -121,10 +120,8 @@ public class MemberController {
 	}
 
 	@PostMapping("/check-password")
-	public ResponseEntity<Boolean> checkPassword(
-			@RequestHeader("Authorization")String token,
-			@RequestBody MemberReqDto memberReqDto) {
-		boolean isValid = memberService.checkPassword(token, memberReqDto.getPwd());
+	public ResponseEntity<Boolean> checkPassword(@RequestBody MemberReqDto memberReqDto) {
+		boolean isValid = memberService.checkPassword( memberReqDto.getPwd());
 		return ResponseEntity.ok(isValid);  // 로그인 성공 시 trueㅌ, 실패 시 false 반환
 	}
 
@@ -141,11 +138,8 @@ public class MemberController {
 
 
 	@PostMapping("/changeNickName")
-	public ResponseEntity<Boolean> changeNickName(
-			@RequestHeader("Authorization") String token, // 헤더에서 토큰 받기
-			@RequestBody MemberReqDto memberReqDto) {
-
-		boolean isValid = memberService.changeNickName(token, memberReqDto.getNickname());
+	public ResponseEntity<Boolean> changeNickName(@RequestBody MemberReqDto memberReqDto) {
+		boolean isValid = memberService.changeNickName(memberReqDto.getNickname());
 		return ResponseEntity.ok(isValid);
 	}
 

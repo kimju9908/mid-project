@@ -13,6 +13,7 @@ import kh.BackendCapstone.jwt.TokenProvider;
 import kh.BackendCapstone.repository.MemberRepository;
 import kh.BackendCapstone.repository.PermissionRepository;
 import kh.BackendCapstone.repository.UserBankRepository;
+import kh.BackendCapstone.security.SecurityUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -67,8 +68,8 @@ public class MemberService {
 		return convertEntityToDto(member);
 	}
 
-	public boolean checkPassword(String token, String password) {
-		Long memberId = getMemberId(token);
+	public boolean checkPassword( String password) {
+		Long memberId = SecurityUtil.getCurrentMemberId();
 		System.out.println(password);
 		System.out.println(memberId);
 		request.getSession().setAttribute("memberId", memberId);
@@ -107,24 +108,14 @@ public class MemberService {
 		}
 	}
 
-	public String getRole(String token) {
-		return convertTokenToEntity(token).getAuthority().toString();
+	public String getRole() {
+		return convertTokenToEntity().getAuthority().toString();
 	}
-	
-	public long getMemberId(String token) {
-		try {
-			Member member = convertTokenToEntity(token);
-			return member.getMemberId(); // memberId 반환
-		} catch (Exception e) {
-			// 예외 로깅
-			e.printStackTrace();
-			throw new RuntimeException("수익금 가져오기 실패", e);
-		}
-	}
-	public void saveRevenue(Long profit, String token) {
+
+	public void saveRevenue(Long profit) {
 		try {
 			// 토큰에서 memberId 추출
-			Long memberId = getMemberId(token);
+			Long memberId = SecurityUtil.getCurrentMemberId();
 
 			// 해당 memberId로 Member 조회
 			Member member = memberRepository.findById(memberId)
@@ -156,9 +147,9 @@ public class MemberService {
 			throw new RuntimeException("수익금 저장 실패: " + e.getMessage(), e);
 		}
 	}
-	public int getRevenue(String token) {
+	public int getRevenue() {
 		try {
-			return convertTokenToEntity(token).getRevenue();
+			return convertTokenToEntity().getRevenue();
 		} catch (Exception e) {
 			// 예외 로깅
 			e.printStackTrace();
@@ -167,23 +158,14 @@ public class MemberService {
 	}
 
 	// 토큰에서 Member 객체를 받아오는 메서드( 클래스 외부에서도 불러올 수 있게 public )
-	public Member convertTokenToEntity(String token) {
+	public Member convertTokenToEntity() {
 		try{
-			// 토큰 앞에 있는 "Bearer " 제거
-			token = token.replace("Bearer ", "");
-			// token 을 통해 memberId를 담고 있는 객체 Authentication 을 불러옴
-			Authentication authentication = tokenProvider.getAuthentication(token);
-			log.warn("Authentication 의 형태 : {}", authentication);
-			// Name 은 String 으로 되어 있기 때문에 Long으로 바꿔주는 과정이 있어야 타입이 일치
-			Long id = Long.parseLong(authentication.getName());
+			Long memberId = SecurityUtil.getCurrentMemberId();
 			// UserBank 정보를 조인으로 함께 가져오기
-			Member member = memberRepository.findByIdWithUserBank(id)
+			Member member = memberRepository.findByIdWithUserBank(memberId)
 				.orElseThrow(()-> new RuntimeException("존재 하지 않는 memberId 입니다."));
-
-			// 이메일을 반환하여 클라이언트에서 처리하도록 함
 			String email = member.getEmail();
 			String nickName = member.getNickName();
-			Long memberId = member.getMemberId();
 			log.warn("토큰으로부터 얻은 이메일: {}", email);
 			log.warn("토큰으로부터 얻은 닉네임: {}", nickName);
 			log.warn("토큰으로부터 얻은 멤버아이디: {}", memberId);
@@ -196,7 +178,7 @@ public class MemberService {
 	}
 
 	public void updatePassword(String newPassword, PasswordEncoder passwordEncoder) {
-		Long memberId = (Long) request.getSession().getAttribute("memberId"); // 수정된 세션 접근 방식
+		Long memberId = (Long) request.getSession().getAttribute("memberId");
 		System.out.println("세션 ID: " + request.getSession().getId());
 		if (memberId == null) {
 			throw new RuntimeException("정보가 만료 되었습니다. 인증을 다시 진행해주세요.");
@@ -212,9 +194,9 @@ public class MemberService {
 
 
 
-	public boolean changeNickName(String token, String nickname) {
+	public boolean changeNickName(String nickname) {
 
-		Long memberId =getMemberId(token);
+		Long memberId = SecurityUtil.getCurrentMemberId();
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new RuntimeException("해당 이메일의 회원을 찾을 수 없습니다."));
 

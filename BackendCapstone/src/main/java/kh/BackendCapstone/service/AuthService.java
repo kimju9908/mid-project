@@ -14,6 +14,7 @@
 		import kh.BackendCapstone.repository.MemberRepository;
 		import kh.BackendCapstone.repository.PermissionRepository;
 		import kh.BackendCapstone.repository.RefreshTokenRepository;
+		import kh.BackendCapstone.security.SecurityUtil;
 		import lombok.RequiredArgsConstructor;
 		import lombok.extern.slf4j.Slf4j;
 		import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -159,25 +160,22 @@
 //				// 4. Permission 객체 저장
 //				permissionRepository.save(permission);
 //			}
-		public boolean  savePermission(String token, String permissionUrl) {
-
-		 Long memberId = memberService.getMemberId(token);
-
-
-	Member member = memberRepository.findById(memberId)
+			public boolean  savePermission( String permissionUrl) {
+			 Long memberId = SecurityUtil.getCurrentMemberId();
+			Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new RuntimeException("Member not found"));
 
-	// 3. Permission 객체 생성
-	Permission permission = new Permission();
-	permission.setMember(member); // member_id에 Member 객체 세팅
-	permission.setPermissionUrl(permissionUrl); // permissionUrl 세팅
-	permission.setRegDate(LocalDateTime.now()); // 등록 날짜 설정
+			// 3. Permission 객체 생성
+			Permission permission = new Permission();
+			permission.setMember(member); // member_id에 Member 객체 세팅
+			permission.setPermissionUrl(permissionUrl); // permissionUrl 세팅
+			permission.setRegDate(LocalDateTime.now()); // 등록 날짜 설정
 
-	// 4. Permission 객체 저장
-	permissionRepository.save(permission);
+			// 4. Permission 객체 저장
+			permissionRepository.save(permission);
 
-	return true; // 성공적으로 저장되었음을 반환
-}
+			return true; // 성공적으로 저장되었음을 반환
+		}
 
 
 

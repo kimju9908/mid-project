@@ -23,8 +23,8 @@ public class TextBoardController {
 	
 	// 글 작성
 	@PostMapping("/create")
-	public ResponseEntity<Long> createBoard(@RequestBody TextBoardReqDto textBoardReqDto, @RequestHeader("Authorization") String token) {
-		Long isSuccess =  textBoardService.createBoard(textBoardReqDto, token);
+	public ResponseEntity<Long> createBoard(@RequestBody TextBoardReqDto textBoardReqDto) {
+		Long isSuccess =  textBoardService.createBoard(textBoardReqDto);
 		log.warn("작성 글 생성({}) : {}", isSuccess, textBoardReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
@@ -37,8 +37,8 @@ public class TextBoardController {
 	}
 	// 글 수정을 위한 조회
 	@GetMapping("/load/id/{boardId}")
-	public ResponseEntity<TextBoardResDto> loadBoardById(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
-		TextBoardResDto rsp = textBoardService.loadByBoardId(boardId, token);
+	public ResponseEntity<TextBoardResDto> loadBoardById(@PathVariable("boardId") Long boardId) {
+		TextBoardResDto rsp = textBoardService.loadByBoardId(boardId);
 		log.warn("글번호 {} 의 글 내용 불러오기 : {}", boardId, rsp);
 		return ResponseEntity.ok(rsp);
 	}
@@ -122,28 +122,28 @@ public class TextBoardController {
 	}
 	
 	@PostMapping("/update")
-	public ResponseEntity<Boolean> updateBoard(@RequestBody TextBoardReqDto textBoardReqDto, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = textBoardService.updateBoard(textBoardReqDto, token);
+	public ResponseEntity<Boolean> updateBoard(@RequestBody TextBoardReqDto textBoardReqDto) {
+		boolean isSuccess = textBoardService.updateBoard(textBoardReqDto);
 		log.warn("글 수정 {} 항목 : {}", isSuccess, textBoardReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
 	@DeleteMapping("/delete/{boardId}")
-	public ResponseEntity<Boolean> deleteBoard(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = textBoardService.deleteBoard(boardId, token);
+	public ResponseEntity<Boolean> deleteBoard(@PathVariable("boardId") Long boardId) {
+		boolean isSuccess = textBoardService.deleteBoard(boardId);
 		log.warn("글번호 : {} 삭제 요청 : {}", boardId, isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
 	
 	@GetMapping("/isAuthor/{boardId}")
-	public ResponseEntity<String> isAuthor(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") String token) {
-		String isSuccess = textBoardService.isAuthor(boardId, token);
+	public ResponseEntity<String> isAuthor(@PathVariable("boardId") Long boardId) {
+		String isSuccess = textBoardService.isAuthor(boardId);
 		log.warn("글번호{} 의 작성자인지 여부 : {} ", boardId, isSuccess);
 		return ResponseEntity.ok(isSuccess);
 	}
 	
 	@GetMapping("/list/comment/{boardId}")
-	public ResponseEntity<List<CommentResDto>> getCommentList(@PathVariable("boardId") Long boardId, @RequestParam int page, @RequestParam int size, @RequestHeader("Authorization") String token) {
-		List<CommentResDto> commentResDtoList = textBoardService.getCommentList(boardId, page, size, token);
+	public ResponseEntity<List<CommentResDto>> getCommentList(@PathVariable("boardId") Long boardId, @RequestParam int page, @RequestParam int size) {
+		List<CommentResDto> commentResDtoList = textBoardService.getCommentList(boardId, page, size);
 		return ResponseEntity.ok(commentResDtoList);
 	}
 	@GetMapping("/list/comment/public/{boardId}")
@@ -159,18 +159,18 @@ public class TextBoardController {
 	}
 	
 	@PostMapping("/create/comment")
-	public ResponseEntity<Boolean> createComment(@RequestBody CommentReqDto commentReqDto, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = textBoardService.createComment(commentReqDto, token);
+	public ResponseEntity<Boolean> createComment(@RequestBody CommentReqDto commentReqDto) {
+		boolean isSuccess = textBoardService.createComment(commentReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
 	@PostMapping("/update/comment")
-	public ResponseEntity<Boolean> updateComment(@RequestBody CommentReqDto commentReqDto, @RequestHeader("Authorization") String token) {
-		boolean isSuccess = textBoardService.updateComment(commentReqDto, token);
+	public ResponseEntity<Boolean> updateComment(@RequestBody CommentReqDto commentReqDto) {
+		boolean isSuccess = textBoardService.updateComment(commentReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
 	@PostMapping("/delete/comment")
-	public ResponseEntity<Boolean> deleteComment(@RequestHeader("Authorization") String token, @RequestBody CommentReqDto commentReqDto) {
-		boolean isSuccess = textBoardService.deleteComment(commentReqDto, token);
+	public ResponseEntity<Boolean> deleteComment(@RequestBody CommentReqDto commentReqDto) {
+		boolean isSuccess = textBoardService.deleteComment(commentReqDto);
 		return ResponseEntity.ok(isSuccess);
 	}
 	

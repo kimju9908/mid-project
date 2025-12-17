@@ -17,13 +17,12 @@ public class FirebaseUploadController {
 	@PostMapping("/upload")
 	public String uploadTest(
 			@RequestParam("file") MultipartFile file,
-			@RequestParam("folderPath") String folderPath,
-			@RequestHeader("Authorization") String token
+			@RequestParam("folderPath") String folderPath
 	) {
 		// "Bearer " 제거 후 실제 토큰만 추출
-		String pureToken = token.replace("Bearer ", "").trim();
 
-		return firebaseUploadService.uploadPermissionFile(file, folderPath, pureToken);
+
+		return firebaseUploadService.uploadPermissionFile(file, folderPath);
 	}
 
 }

@@ -174,11 +174,11 @@ public class AdminService {
 	}
 	
 	@Transactional
-	public ResponseEntity<List<Boolean>> convertCsvToUniv(MultipartFile csvFile, String token) {
+	public ResponseEntity<List<Boolean>> convertCsvToUniv(MultipartFile csvFile) {
 		List<Boolean> resultList = new ArrayList<>();
 		try {
 			// 인증된 사용자 확인
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if (member.getAuthority().equals(Authority.ROLE_ADMIN)) {
 				// CSV 파일 파싱 시작
 				BufferedReader reader = new BufferedReader(new InputStreamReader(csvFile.getInputStream()));
@@ -227,10 +227,10 @@ public class AdminService {
 	}
 	
 	@Transactional
-	public ResponseEntity<List<Boolean>> convertCsvToTextBoard(MultipartFile csvFile, String token) {
+	public ResponseEntity<List<Boolean>> convertCsvToTextBoard(MultipartFile csvFile) {
 		List<Boolean> resultList = new ArrayList<>();
 		try {
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if (!member.getAuthority().equals(Authority.ROLE_ADMIN)) {
 				log.error("권한이 없습니다.");
 				return ResponseEntity.status(403).body(null); // 403 Forbidden
@@ -282,10 +282,10 @@ public class AdminService {
 	}
 	
 	@Transactional
-	public ResponseEntity<List<Boolean>> convertCsvToBank(MultipartFile csvFile, String token) {
+	public ResponseEntity<List<Boolean>> convertCsvToBank(MultipartFile csvFile) {
 		List<Boolean> resultList = new ArrayList<>();
 		try {
-			Member member = memberService.convertTokenToEntity(token);
+			Member member = memberService.convertTokenToEntity();
 			if (!member.getAuthority().equals(Authority.ROLE_ADMIN)) {
 				log.error("권한이 없습니다.");
 				return ResponseEntity.status(403).body(null); // 403 Forbidden

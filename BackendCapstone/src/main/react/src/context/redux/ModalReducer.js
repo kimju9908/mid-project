@@ -6,7 +6,6 @@ const initialState = {
 	isLoginModalOpen: false,
 	isSignupModalOpen: false,
 };
-
 const ModalReducer = createSlice({
 	name: "modal",
 	initialState,
@@ -31,7 +30,6 @@ const ModalReducer = createSlice({
 		},
 	},
 });
-
 export const {
 	setModalOpen,
 	setIsMaterialModalOpen,

@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-// 리덕스 상태와 로컬 스토리지를 동기화하는 커스텀 훅
 const useSyncedState = (key, actionCreator, defaultValue) => {
 	const state = useSelector((state) => state[key]); // 리덕스 상태
 	const dispatch = useDispatch();

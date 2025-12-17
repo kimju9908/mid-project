@@ -223,14 +223,14 @@ public class FileBoardController {
 	}
 	
 	@GetMapping("/board/{id}")
-	public ResponseEntity<FileBoardResDto> getBoard(@PathVariable("id") Long fileId, @RequestHeader(value = "Authorization") String token) {
-		FileBoardResDto fileBoardResDto = fileBoardService.getBoard(fileId, token);
+	public ResponseEntity<FileBoardResDto> getBoard(@PathVariable("id") Long fileId) {
+		FileBoardResDto fileBoardResDto = fileBoardService.getBoard(fileId);
 		return ResponseEntity.ok(fileBoardResDto);
 	}
 	
 	@GetMapping("/board/public/{id}")
 	public ResponseEntity<FileBoardResDto> getBoardPublic(@PathVariable("id") Long fileId) {
-		FileBoardResDto fileBoardResDto = fileBoardService.getBoard(fileId, "");
+		FileBoardResDto fileBoardResDto = fileBoardService.getBoard(fileId);
 		return ResponseEntity.ok(fileBoardResDto);
 	}
 

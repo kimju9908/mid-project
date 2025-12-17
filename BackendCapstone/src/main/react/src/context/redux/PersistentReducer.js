@@ -32,7 +32,6 @@ const PersistentReducer = createSlice({
 		},
 	},
 });
-
 export const selectIsLogin = state => state.role !== "REST_USER" && state.role !== "";
 export const { setAccessToken, setRefreshToken, setRole, logout, } = PersistentReducer.actions;
 export default PersistentReducer.reducer;

@@ -33,9 +33,9 @@ public class PsWriteService {
     private final MemberService memberService;
 
     @Transactional
-    public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList, String token) {
+    public PsWriteResDto savePsWrite(PsWriteReqDto psWriteReqDto, List<PsContentsReqDto> contentsReqDtoList) {
         // 작성자 조회
-        Member member = memberService.convertTokenToEntity(token);
+        Member member = memberService.convertTokenToEntity();
         if (!member.getMemberId().equals(psWriteReqDto.getMemberId())) return null;
         
         PsWrite psWrite;
@@ -90,11 +90,11 @@ public class PsWriteService {
     }
     
     
-    public PsWriteResDto loadPsWrite(Long psWriteId, String token) {
+    public PsWriteResDto loadPsWrite(Long psWriteId) {
         try {
             PsWrite psWrite = psWriteRepository.findById(psWriteId)
                 .orElseThrow(() -> new RuntimeException("해당 자소서가 없습니다."));
-            Member member = memberService.convertTokenToEntity(token);
+            Member member = memberService.convertTokenToEntity();
             if (psWrite.getMember().equals(member)) {
                 PsWriteResDto psWriteResDto = convertToDto(psWrite);
                 log.warn("작성한 자소서 번호 불러오기 :{}-{}", psWriteId, psWriteResDto);
@@ -107,8 +107,8 @@ public class PsWriteService {
         }
     }
     
-    public Long newPsWrite(String token) {
-        Member member = memberService.convertTokenToEntity(token);
+    public Long newPsWrite() {
+        Member member = memberService.convertTokenToEntity();
         PsWrite psWrite = new PsWrite();
         psWrite.setMember(member);
         psWrite.setPsName("새 자기소개서");
@@ -122,8 +122,8 @@ public class PsWriteService {
         psWriteRepository.save(psWrite);
         return psWrite.getPsWriteId();
     }
-    public List<PsWriteListResDto> getPsWriteList(String token) {
-        Member member = memberService.convertTokenToEntity(token);
+    public List<PsWriteListResDto> getPsWriteList() {
+        Member member = memberService.convertTokenToEntity();
         List<PsWrite> psWriteList = psWriteRepository.findByMember(member);
         log.warn("리스트 반환 : {} ", psWriteList);
         return convertListToDto(psWriteList);

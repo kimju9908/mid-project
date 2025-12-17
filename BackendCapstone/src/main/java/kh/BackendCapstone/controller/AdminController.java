@@ -86,21 +86,19 @@ public class AdminController {
 	}
 	
 	@PostMapping("/csv/univ")
-	public ResponseEntity<List<Boolean>> uploadUniv(@RequestParam("file") MultipartFile file,
-	                                                @RequestHeader("Authorization") String token) {
-		return adminService.convertCsvToUniv(file, token);
+	public ResponseEntity<List<Boolean>> uploadUniv(@RequestParam("file") MultipartFile file
+	                                                ) {
+		return adminService.convertCsvToUniv(file);
 	}
 	
 	@PostMapping("/csv/textBoard")
-	public ResponseEntity<List<Boolean>> uploadTextBoard(@RequestParam("file") MultipartFile file,
-	                                                     @RequestHeader("Authorization") String token) {
-		return adminService.convertCsvToTextBoard(file, token);
+	public ResponseEntity<List<Boolean>> uploadTextBoard(@RequestParam("file") MultipartFile file) {
+		return adminService.convertCsvToTextBoard(file);
 	}
 	
 	@PostMapping("/csv/bank")
-	public ResponseEntity<List<Boolean>> uploadBank(@RequestParam("file") MultipartFile file,
-	                                                     @RequestHeader("Authorization") String token) {
-		return adminService.convertCsvToBank(file, token);
+	public ResponseEntity<List<Boolean>> uploadBank(@RequestParam("file") MultipartFile file) {
+		return adminService.convertCsvToBank(file);
 	}
 	
 	@GetMapping("/settlement/list")

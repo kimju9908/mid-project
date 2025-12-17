@@ -41,14 +41,6 @@
 		private final MemberService memberService;
 
 
-		@GetMapping("/getMemberId")
-		public ResponseEntity<Long> getMemberId() {
-			Long memberId = SecurityUtil.getCurrentMemberId();  // 현재 인증된 사용자의 memberId를 가져옴
-			if (memberId == null) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // 인증되지 않은 경우
-			}
-			return ResponseEntity.ok(memberId);
-		}
 
 		// 회원가입 여부 확인 , 이메일 중복 확인
 		@GetMapping("/exist/{email}")
@@ -204,12 +196,11 @@
 
 
 		@PostMapping("/savePermission")
-		public ResponseEntity<Boolean> savePermission(
-				@RequestHeader("Authorization") String token, // 헤더에서 token 받기
+		public ResponseEntity<Boolean> savePermission(// 헤더에서 token 받기
 				@RequestBody PermissionReqDto permissionReqDto) { // RequestBody에서 permissionUrl 받기
 
 			try {
-				boolean result = authService.savePermission(token, permissionReqDto.getPermissionUrl());
+				boolean result = authService.savePermission(permissionReqDto.getPermissionUrl());
 				if (result) {
 					return ResponseEntity.ok(true); // 성공적으로 저장되었으면 true 반환
 				} else {
