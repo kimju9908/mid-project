@@ -87,7 +87,6 @@ public class MemberService {
 		try {
 			Member member = memberRepository.findById(memberId)
 					.orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
-
 			// 회원 상태를 SECESSION으로 변경
 			member.setMembership(Membership.SECESSION);
 			member.setEmail(memberId + "deleted" + UUID.randomUUID());
@@ -100,7 +99,6 @@ public class MemberService {
 			member.setUserId(memberId + "deleted" + UUID.randomUUID());
 			member.setUniv(null);  // 기존
 			memberRepository.save(member);
-
 			return true;
 		} catch (Exception e) {
 			log.error("회원 탈퇴 처리에 실패 했습니다 : {}", e.getMessage());
@@ -108,35 +106,30 @@ public class MemberService {
 		}
 	}
 
+
 	public String getRole() {
 		return convertTokenToEntity().getAuthority().toString();
 	}
 
 	public void saveRevenue(Long profit) {
 		try {
-			// 토큰에서 memberId 추출
 			Long memberId = SecurityUtil.getCurrentMemberId();
-
 			// 해당 memberId로 Member 조회
 			Member member = memberRepository.findById(memberId)
 					.orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
-
 			// 출금 가능한 금액인지 확인
 			if (member.getRevenue() < profit) {
 				throw new RuntimeException("출금 가능한 금액을 초과했습니다.");
 			}
-
 			// revenue 갱신
 			int newRevenue = (int) (member.getRevenue() - profit); // 타입 캐스팅
 			member.setRevenue(newRevenue);
 			memberRepository.save(member); // 변경된 member 저장
-
 			// Member를 통해 UserBank 정보 조회
 			UserBank userBank = member.getUserBank();
 			if (userBank == null) {
 				throw new RuntimeException("연결된 계좌 정보가 없습니다.");
 			}
-
 			// withdrawal 필드에 출금 금액 누적 (기존 값에 추가)
 			Long currentWithdrawal = userBank.getWithdrawal() != null ? userBank.getWithdrawal() : 0L;
 			userBank.setWithdrawal(currentWithdrawal + profit);
@@ -192,10 +185,7 @@ public class MemberService {
 		request.getSession().removeAttribute("memberId"); // 세션에서 이메일 제거
 	}
 
-
-
 	public boolean changeNickName(String nickname) {
-
 		Long memberId = SecurityUtil.getCurrentMemberId();
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new RuntimeException("해당 이메일의 회원을 찾을 수 없습니다."));
@@ -205,11 +195,6 @@ public class MemberService {
 		memberRepository.save(member); // 변경 사항 저장
 		return true;
 	}
-
-
-
-
-	
 	// 회원 정보 수정
 	public boolean updateMember(MemberReqDto memberReqDto) {
 		try {
@@ -223,7 +208,6 @@ public class MemberService {
 			return false;
 		}
 	}
-
 	public boolean updateBankInfo(Long memberId, String bankName, String bankAccount) {
 		// Member를 통해 UserBank 정보 조회
 		Member member = memberRepository.findById(memberId)
@@ -242,10 +226,8 @@ public class MemberService {
 			newUserBank.setBankName(bankName);
 			newUserBank.setBankAccount(bankAccount);
 			newUserBank.setWithdrawal(0L); // 초기 인출 금액 설정
-
 			// 먼저 UserBank 저장
 			UserBank savedUserBank = userBankRepository.save(newUserBank);
-
 			// Member에 UserBank 연결
 			member.setUserBank(savedUserBank);
 			memberRepository.save(member);
@@ -254,27 +236,18 @@ public class MemberService {
 		}
 	}
 
-	public List<MemberPermissionResDto> convertTokenToPermission(String token) {
-		// 토큰 앞에 있는 "Bearer " 제거
-		token = token.replace("Bearer ", "");
-
-		// token을 통해 memberId를 담고 있는 객체 Authentication을 불러옴
-		Authentication authentication = tokenProvider.getAuthentication(token);
-		Long memberId = Long.parseLong(authentication.getName());
-
+	public List<MemberPermissionResDto> convertPermission() {
+		Long memberId = SecurityUtil.getCurrentMemberId();
 		// Member를 통해 해당 Permission 정보 조회
 		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new RuntimeException("존재하지 않는 memberId 입니다."));
-
 		// 해당 member의 Permission 정보 조회 (여러 개가 나올 수 있음)
 		List<Permission> permissions = permissionRepository.findByMember(member);
 
 		if (permissions.isEmpty()) {
 			throw new RuntimeException("해당 member에 대한 Permission 정보가 없습니다.");
 		}
-
 		List<MemberPermissionResDto> result = new ArrayList<>();
-
 		// 여러 개의 Permission 정보를 처리
 		for (Permission permission : permissions) {
 			// "ACTIVE"인 경우에만 DTO 생성하여 반환
@@ -284,12 +257,10 @@ public class MemberService {
 				if (univ == null) {
 					throw new RuntimeException("Permission에 대학교 정보가 없습니다.");
 				}
-
 				// Member의 univ 정보가 없으면 permission에서 가져온 univ를 사용
 				if (member.getUniv() == null) {
 					member.setUniv(univ);  // univ 설정
 				}
-
 				result.add(new MemberPermissionResDto(
 						member.getMemberId(),
 						univ.getUnivName(),

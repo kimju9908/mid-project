@@ -144,10 +144,9 @@ public class MemberController {
 	}
 
 	@GetMapping("/permission")
-	public ResponseEntity<List<MemberPermissionResDto>> convertTokenToPermission(@RequestHeader("Authorization") String token) {
+	public ResponseEntity<List<MemberPermissionResDto>> convertTokenToPermission() {
 		try {
-			String actualToken = token.startsWith("Bearer ") ? token.substring(7) : token;
-			List<MemberPermissionResDto> memberPermissionResDtos = memberService.convertTokenToPermission(actualToken);
+			List<MemberPermissionResDto> memberPermissionResDtos = memberService.convertPermission();
 			System.out.println("memberPermissionResDtos : " + memberPermissionResDtos);
 			return ResponseEntity.ok(memberPermissionResDtos);
 		} catch (Exception e) {
