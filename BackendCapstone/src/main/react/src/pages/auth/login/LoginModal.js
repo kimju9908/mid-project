@@ -31,7 +31,7 @@ import Commons from "../../../util/Common";
 
 
 const LoginModal = ({ closeModal }) => {
-  const DOMAIN = 'http://localhost:8111'; // 도메인 수정
+  const DOMAIN = 'http://uniguide.store'; // 도메인 수정
   const API_DOMAIN = `${DOMAIN}/api/v1`;
   const SNS_SIGN_IN_URL = (type) => `${API_DOMAIN}/auth/oauth2/${type}`;
   const onSnsSignInButtonClickHandler = (type) => {
