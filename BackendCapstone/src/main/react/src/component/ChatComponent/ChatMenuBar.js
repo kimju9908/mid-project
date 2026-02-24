@@ -32,13 +32,13 @@ const IconSvg = styled.img`
 const ChatMenuBar = ({setSelectedPage, selectedPage}) => {
     return(
         <ChatNavBar>
-            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fchatting.svg?alt=media"} alt="Chatting"
+            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fchatting.svg?alt=media"} alt="Chatting"
                      isSelected={selectedPage === "chatList" || selectedPage === "chatting"}
                      onClick={() => setSelectedPage("chatList")}/>
-            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fsearch.svg?alt=media"} alt="Search"
+            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fsearch.svg?alt=media"} alt="Search"
                      isSelected={selectedPage === "openChatSearch" || selectedPage === "chatRoomCreate"}
                      onClick={() => setSelectedPage("openChatSearch")}/>
-            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/chat.png?alt=media"} alt="Chatbot"
+            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/chatbot.svg?alt=media"} alt="Chatbot"
                      isSelected={selectedPage === "chatBot"}
                      onClick={() => setSelectedPage("chatBot")}/>
         </ChatNavBar>

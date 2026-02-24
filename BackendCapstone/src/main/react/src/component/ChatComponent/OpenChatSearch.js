@@ -224,7 +224,7 @@ const OpenChatSearch = ({ setSelectedPage }) => {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
-                <SearchIcon src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fsearch.svg?alt=media"} alt="Search" onClick={handleSearch}/>
+                <SearchIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fsearch.svg?alt=media"} alt="Search" onClick={handleSearch}/>
             </SearchBox>
             <ChatUl>
                 {filteredChatRooms.map((room) => (

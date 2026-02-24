@@ -5,9 +5,27 @@ import axiosInstance from "../api/AxiosInstance";
 
 moment.locale("ko"); // 한국 시간 적용
 
+const getWebSocketUrl = () => {
+  if (typeof window === "undefined") {
+    return "ws://localhost:8111/ws/chat";
+  }
+
+  const isLocalhost =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1";
+
+  // 로컬 프론트(3000) + 로컬 백엔드(8111) 개발환경 대응
+  if (isLocalhost) {
+    return "ws://localhost:8111/ws/chat";
+  }
+
+  const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return `${wsProtocol}//${window.location.host}/ws/chat`;
+};
+
 const Commons = {
   Capstone: "",
-  Capstone_URL: "ws://uniguide.store/ws/chat",
+  Capstone_URL: getWebSocketUrl(),
   timeFromNow: (timestamp) => {
     return moment(timestamp).fromNow();
   },

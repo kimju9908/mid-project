@@ -256,7 +256,16 @@ const Chatting = ({ setSelectedPage }) => {
         // 웹소켓 연결하는 부분, 이전 대화내용 불러오는 함수 호출
         if (!ws.current) {
             ws.current = new WebSocket(Commons.Capstone_URL);
+            ws.current.onerror = (error) => {
+                console.error("WebSocket 연결 오류:", error, Commons.Capstone_URL);
+                setSocketConnected(false);
+            };
+            ws.current.onclose = (event) => {
+                console.warn("WebSocket 연결 종료:", event.code, event.reason);
+                setSocketConnected(false);
+            };
             ws.current.onopen = () => {
+                console.log("WebSocket 연결 성공:", Commons.Capstone_URL);
                 setSocketConnected(true);
 
                 // 채팅방 입장하기 전에 sender에 nickName을 설정
@@ -383,9 +392,9 @@ const Chatting = ({ setSelectedPage }) => {
     return (
         <ChattingRoomBg>
             <ChattingTitle>
-                <ChattingIcon src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fback.svg?alt=media"} alt="Back" onClick={onClickExit} />
+                <ChattingIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fback.svg?alt=media"} alt="Back" onClick={onClickExit} />
                 {roomName}
-                <ChattingIcon src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fexit.svg?alt=media"} alt="Exit" onClick={ExitChatRoom} />
+                <ChattingIcon src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fexit.svg?alt=media"} alt="Exit" onClick={ExitChatRoom} />
             </ChattingTitle>
             <MessagesContainer ref={ChatContainerRef}>
                 {chatList?.map((chat, index) => {
@@ -424,7 +433,7 @@ const Chatting = ({ setSelectedPage }) => {
                     onKeyUp={onEnterKey}
                 />
                 <SendButton
-                    src={"https://firebasestorage.googleapis.com/v0/b/uniguide-3d422.firebasestorage.app/o/firebase%2Fchaticon%2Fsend_color.png?alt=media"} alt="Send"
+                    src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fsend_color.png?alt=media"} alt="Send"
                     onClick={onClickMsgSend}
                     disabled={!inputMsg.trim()}
                 />
