@@ -102,7 +102,6 @@
 				}
 			}
 			public AccessTokenDto refreshAccessToken(String refreshToken) {
-				log.info("일반refreshExist : {}", refreshTokenRepository.existsByRefreshToken(refreshToken));
 				//DB에 일치하는 refreshToken이 있으면
 				if(refreshTokenRepository.existsByRefreshToken(refreshToken) ) {
 					// refreshToken 검증

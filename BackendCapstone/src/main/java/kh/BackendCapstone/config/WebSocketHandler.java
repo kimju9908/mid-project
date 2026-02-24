@@ -32,25 +32,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 			ChatMsgDto chatMsg = objectMapper.readValue(payload, ChatMsgDto.class);
 			String roomId = chatMsg.getRoomId();
 
-			/*ChatRoomResDto chatRoom = chatService.findRoomById(roomId);
-			if (chatRoom != null) {
-				log.warn("session : {}", session);
-				log.info("채팅룸의 getRegDate() : {}", chatRoom.getRegDate());
-				sessionRoomIdMap.put(session, roomId);
-				log.info("채팅룸 세션 확인해야함 : {}", sessionRoomIdMap);
-
-				if (chatMsg.getType() == ChatMsgDto.MsgType.ENTER) {
-					chatRoom.handlerActions(session, chatMsg, chatService);
-					log.info("입장 메시지 전송");
-					roomMembersMap.computeIfAbsent(roomId, k -> new HashSet<>()).add(chatMsg.getSender());
-				} else if (chatMsg.getType() == ChatMsgDto.MsgType.TALK) {
-					chatRoom.handlerActions(session, chatMsg, chatService);
-				} else if (chatMsg.getType() == ChatMsgDto.MsgType.CLOSE) {
-					chatRoom.handleSessionClosed(session, chatService);
-				}
-			} else {
-				log.error("채팅룸을 ID로 찾을 수 없습니다. RoomId: {}", roomId);
-			}*/
 			if (chatMsg.getType() == ChatMsgDto.MsgType.ENTER) {
 				sessionRoomIdMap.put(session, chatMsg.getRoomId());
 				chatService.addSessionAndHandlerEnter(roomId, session, chatMsg);

@@ -9,9 +9,9 @@ import kh.BackendCapstone.entity.chat.Chat;
 import kh.BackendCapstone.entity.chat.ChatMember;
 import kh.BackendCapstone.entity.chat.ChatRoom;
 import kh.BackendCapstone.repository.MemberRepository;
-import kh.BackendCapstone.repository.chat.ChatMemberRepository;
-import kh.BackendCapstone.repository.chat.ChatRepository;
-import kh.BackendCapstone.repository.chat.ChatRoomRepository;
+import kh.BackendCapstone.repository.ChatMemberRepository;
+import kh.BackendCapstone.repository.ChatRepository;
+import kh.BackendCapstone.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -108,6 +108,7 @@ public class ChatService {
         chatRoomEntity.setRegDate(LocalDateTime.now());
         chatRoomEntity.setRoomType(chatRoomDto.getRoomType());
         chatRoomEntity.setPersonCnt(chatRoomDto.getPersonCnt());
+        chatRoomEntity.setMaxMembers(chatRoomDto.getPersonCnt());
         chatRoomRepository.save(chatRoomEntity);
 
         chatRooms.put(randomId, chatRoom);

@@ -58,7 +58,7 @@ const ChattingApi = {
     const token = localStorage.getItem("accessToken");
     const response = await axios.get(Capstone + `/member/nickName`, {
         headers: {
-          Authorization: `Bearer ${token}`, // ✅ 헤더에 토큰 추가
+          Authorization: `Bearer ${token}`,
         },
     });
     return response;

@@ -1,4 +1,4 @@
-package kh.BackendCapstone.repository.chat;
+package kh.BackendCapstone.repository;
 
 import kh.BackendCapstone.entity.chat.Chat;
 import org.springframework.data.domain.Page;

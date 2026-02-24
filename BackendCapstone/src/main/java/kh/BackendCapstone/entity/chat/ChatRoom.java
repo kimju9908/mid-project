@@ -44,11 +44,18 @@ public class ChatRoom {
     @Column(name = "person_cnt", nullable = false)
     private Integer personCnt; // 최대 입장 가능 인원
 
+    // DB 스키마에서 요구하는 최대 인원 컬럼
+    @Column(name = "max_members", nullable = false)
+    private Integer maxMembers;
+
     // 기본값 설정
     @PrePersist
     public void prePersist() {
         if (this.roomType == null) {
             this.roomType = ChatRoomType.GROUP;
+        }
+        if (this.maxMembers == null) {
+            this.maxMembers = this.personCnt;
         }
     }
 }
