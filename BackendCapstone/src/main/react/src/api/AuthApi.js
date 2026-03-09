@@ -305,6 +305,25 @@ const AuthApi = {
 	deleteId: () => {
 		return axiosInstance.get(baseUrl + `/member/deleteUser`);
 	},
+
+	createRedactionJob: (file) => {
+		const formData = new FormData();
+		formData.append("file", file);
+		return axiosInstance.post(baseUrl + "/flask/redaction/jobs", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data"
+			}
+		});
+	},
+
+	getRedactionJob: (jobId) => {
+		return axiosInstance.get(baseUrl + `/flask/redaction/jobs/${jobId}`);
+	},
+
+	applyRedactionJob: (jobId, payload) => {
+		return axiosInstance.post(baseUrl + `/flask/redaction/jobs/${jobId}/apply`, payload);
+	},
+
 	uploadPermission: (formData) => {
 		return axiosInstance.post(baseUrl + "/firebase/upload", formData, {
 			headers: {

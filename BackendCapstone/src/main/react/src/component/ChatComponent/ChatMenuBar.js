@@ -38,7 +38,7 @@ const ChatMenuBar = ({setSelectedPage, selectedPage}) => {
             <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fsearch.svg?alt=media"} alt="Search"
                      isSelected={selectedPage === "openChatSearch" || selectedPage === "chatRoomCreate"}
                      onClick={() => setSelectedPage("openChatSearch")}/>
-            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/chatbot.svg?alt=media"} alt="Chatbot"
+            <IconSvg src={"https://firebasestorage.googleapis.com/v0/b/ipsi-f2028.firebasestorage.app/o/firebase%2Fchaticon%2Fchatbot.svg?alt=media"} alt="Chatbot"
                      isSelected={selectedPage === "chatBot"}
                      onClick={() => setSelectedPage("chatBot")}/>
         </ChatNavBar>

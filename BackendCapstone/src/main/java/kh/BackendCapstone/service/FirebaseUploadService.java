@@ -27,6 +27,7 @@ public class FirebaseUploadService {
 	private final RestTemplate restTemplate;
 	private final MemberService memberService;
 	private final PermissionRepository permissionRepository;
+	private final ObjectMapper objectMapper;
 	
 	/*
     fileUpload 사용 방법 : Flask 부분을 다운받고 구글 드라이브의 firebase 파일 안에  ipsi-firebase-adminsdk.json을 app.py가 있는 디렉토리에 놓는다.
@@ -109,6 +110,62 @@ public String uploadPermissionFile(MultipartFile file, String folderPath) {
 		return "파일 업로드 중 오류가 발생했습니다.";
 	}
 }
+
+	public String uploadBytesToFirebase(byte[] fileBytes, String fileName, String folderPath) {
+		try {
+			String flaskUrl = "http://localhost:5000/spring/upload/firebase";
+			String finalFolderPath = "firebase/" + folderPath;
+
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+			ByteArrayResource fileResource = new ByteArrayResource(fileBytes) {
+				@Override
+				public String getFilename() {
+					return fileName;
+				}
+			};
+
+			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+			body.add("file", fileResource);
+			body.add("folderPath", finalFolderPath);
+			body.add("fileName", fileName);
+
+			HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
+			ResponseEntity<String> response = restTemplate.exchange(flaskUrl, HttpMethod.POST, entity, String.class);
+			log.warn("바이트 파일 업로드 결과 : {}", response);
+			return extractUrlFromUploadResponse(response.getBody());
+		} catch (Exception e) {
+			log.error("바이트 파일 업로드 중 오류 발생: ", e);
+			throw new RuntimeException("Firebase 업로드 중 오류가 발생했습니다.", e);
+		}
+	}
+
+	public String uploadPermissionMaskedPdf(byte[] fileBytes, String fileName) {
+		Member member = memberService.convertTokenToEntity();
+		if (member == null || member.getMemberId() == null) {
+			throw new RuntimeException("회원 정보를 확인할 수 없습니다.");
+		}
+		String permissionFolderPath = "permission/" + member.getMemberId();
+		return uploadBytesToFirebase(fileBytes, fileName, permissionFolderPath);
+	}
+
+	private String extractUrlFromUploadResponse(String responseBody) {
+		if (responseBody == null || responseBody.isBlank()) {
+			throw new RuntimeException("Firebase 업로드 응답이 비어 있습니다.");
+		}
+		try {
+			JsonNode root = objectMapper.readTree(responseBody);
+			String url = root.path("url").asText("");
+			if (url.isBlank()) {
+				throw new RuntimeException("Firebase 업로드 응답에 url 필드가 없습니다.");
+			}
+			return url;
+		} catch (Exception e) {
+			log.error("Firebase 업로드 응답 파싱 실패 : {}", responseBody, e);
+			throw new RuntimeException("Firebase 업로드 응답 파싱 실패", e);
+		}
+	}
 
 
 

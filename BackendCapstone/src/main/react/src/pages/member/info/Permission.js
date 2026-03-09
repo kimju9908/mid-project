@@ -1,73 +1,146 @@
 import { useState, useEffect, useRef } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from "@mui/material";
 import AuthApi from "../../../api/AuthApi";
-import axios from "axios";
-import Commons from "../../../util/Common";
 
 const Permission = () => {
   const [uploadStatus, setUploadStatus] = useState("");
   const [userData, setUserData] = useState([]); // DB에서 가져온 사용자 정보
   const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+  const [jobInfo, setJobInfo] = useState(null);
+  const [boxSelections, setBoxSelections] = useState({});
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const fileInputRef = useRef(null); // 파일 선택 input 참조
 
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const data = await AuthApi.fetchUserData(token); // authApi의 fetchUserData 함수 호출
+      setUserData(data); // 데이터 저장
+      console.log(data);
+    } catch (error) {
+      console.error("사용자 데이터 가져오기 실패:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("accessToken");
-        const data = await AuthApi.fetchUserData(token); // authApi의 fetchUserData 함수 호출
-        setUserData(data); // 데이터 저장
-          console.log(data);
-      } catch (error) {
-        console.error("사용자 데이터 가져오기 실패:", error);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const resetPermissionPageState = () => {
+    setSelectedFile(null);
+    setJobInfo(null);
+    setBoxSelections({});
+    setUploadStatus("");
+    setIsPreviewModalOpen(false);
+    setIsApplying(false);
+    setIsPreviewLoading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file);
+    setJobInfo(null);
+    setBoxSelections({});
+    setUploadStatus("");
   };
 
-  const handleUpload = async () => {
+  const handlePreview = async () => {
     if (!selectedFile) {
       setUploadStatus("업로드할 파일을 선택하세요.");
       return;
     }
-  
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-    formData.append("folderPath", "permission");
-  
-    try {
-        const response = await AuthApi.uploadPermission(formData);
-  
-      if (response.data.message === "File uploaded successfully") {
-        setUploadStatus("파일 업로드 성공!");
-  
-        // 파일 업로드 후 permissionUrl을 생성하여 서버로 보내기
-        const permissionUrl = response.data.url; // 서버에서 반환된 URL
 
-  
-        // 서버로 permissionReqDto 전송
-        const saveResponse = await AuthApi.savePermission(permissionUrl)
-        if (saveResponse.data) {
-          setUploadStatus("파일과 권한 정보 저장 성공!");
-        } else {
-          setUploadStatus("파일과 권한 정보 저장 실패.");
-        }
+    setIsPreviewLoading(true);
+    try {
+      const response = await AuthApi.createRedactionJob(selectedFile);
+      const data = response.data;
+
+      setJobInfo(data);
+      const initialSelections = {};
+      (data.detectedBoxes || []).forEach((_, index) => {
+        initialSelections[index] = true;
+      });
+      setBoxSelections(initialSelections);
+      setIsPreviewModalOpen(true);
+
+      setUploadStatus("자동 탐지가 완료되었습니다. 박스를 확인 후 최종 업로드를 진행하세요.");
+    } catch (error) {
+      setUploadStatus("미리보기/자동 탐지 생성 중 오류가 발생했습니다.");
+      console.error("미리보기 생성 오류:", error);
+    } finally {
+      setIsPreviewLoading(false);
+    }
+  };
+
+  const handleToggleBox = (index) => {
+    setBoxSelections((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const handleFinalUpload = async () => {
+    if (!jobInfo?.jobId) {
+      setUploadStatus("먼저 자동 탐지를 실행하세요.");
+      return;
+    }
+
+    setIsApplying(true);
+    try {
+      const finalBoxes = (jobInfo.detectedBoxes || []).map((box, index) => ({
+        ...box,
+        selected: !!boxSelections[index],
+      }));
+
+      const applyResponse = await AuthApi.applyRedactionJob(jobInfo.jobId, {
+        boxes: finalBoxes,
+        folderPath: "permission",
+        fileName: `${jobInfo.jobId}_masked.pdf`,
+      });
+
+      const maskedPdfUrl = applyResponse.data?.maskedPdfUrl;
+      if (!maskedPdfUrl) {
+        setUploadStatus("마스킹 파일 URL을 받지 못했습니다.");
+        return;
+      }
+
+      const saveResponse = await AuthApi.savePermission(maskedPdfUrl);
+      if (saveResponse?.data) {
+        setUploadStatus("마스킹된 PDF 업로드 및 권한 정보 저장이 완료되었습니다.");
+        resetPermissionPageState();
+        await fetchData();
       } else {
-        setUploadStatus("파일 업로드 실패.");
+        setUploadStatus("마스킹 PDF 업로드는 완료됐지만 권한 정보 저장에 실패했습니다.");
       }
     } catch (error) {
-      setUploadStatus("파일 업로드 중 오류 발생.");
-      console.error("파일 업로드 중 오류:", error);
+      setUploadStatus("최종 레닥션 적용 또는 업로드 중 오류가 발생했습니다.");
+      console.error("레닥션 확정 오류:", error);
+    } finally {
+      setIsApplying(false);
     }
-  }
-
-
+  };
 
   return (
     <Box sx={{ width: "90%", maxWidth: "1200px", margin: "auto", padding: 5, backgroundColor: "#ffffff" }}>
@@ -146,18 +219,89 @@ const Permission = () => {
             borderRadius: "6px",
             "&:hover": { backgroundColor: "#5A4ACD" },
           }}
-          onClick={handleUpload}
+          onClick={handlePreview}
+          disabled={isPreviewLoading}
         >
-          증명서 업로드
+          {isPreviewLoading ? "탐지 중..." : "자동 탐지 시작"}
         </Button>
       </Box>
 
-      {/* 업로드 상태 메시지 */}
-      {uploadStatus && (
-        <Typography variant="body2" sx={{ marginTop: 2, textAlign: "center", color: uploadStatus.includes("성공") ? "green" : "red" }}>
-          {uploadStatus}
-        </Typography>
-      )}
+      <Dialog
+        open={isPreviewModalOpen}
+        onClose={() => {
+          if (!isApplying) {
+            setIsPreviewModalOpen(false);
+          }
+        }}
+        fullWidth
+        maxWidth="lg"
+      >
+        <DialogTitle>자동 탐지 결과 검수</DialogTitle>
+        <DialogContent dividers>
+          {uploadStatus && (
+            <Typography
+              variant="body2"
+              sx={{
+                marginBottom: 2,
+                color: uploadStatus.includes("완료") || uploadStatus.includes("성공") ? "green" : "red",
+              }}
+            >
+              {uploadStatus}
+            </Typography>
+          )}
+          {jobInfo && (
+            <>
+              <Typography variant="body2" sx={{ color: "gray", marginBottom: 2 }}>
+                상태: {jobInfo.status} / 파이프라인: {jobInfo.pipelineType}
+              </Typography>
+
+              {(jobInfo.previewImages || []).map((preview) => (
+                <Box key={`preview-${preview.pageIndex}`} sx={{ marginBottom: 2 }}>
+                  <Typography variant="body2" sx={{ marginBottom: 1 }}>
+                    페이지 {preview.pageIndex + 1}
+                  </Typography>
+                  {preview.imageUrl && (
+                    <img
+                      src={preview.imageUrl}
+                      alt={`preview-${preview.pageIndex}`}
+                      style={{ width: "100%", maxWidth: "900px", borderRadius: "8px", border: "1px solid #ddd" }}
+                    />
+                  )}
+                </Box>
+              ))}
+
+              {(jobInfo.detectedBoxes || []).map((box, index) => (
+                <FormControlLabel
+                  key={`box-${index}`}
+                  control={<Checkbox checked={!!boxSelections[index]} onChange={() => handleToggleBox(index)} />}
+                  label={`[${box.reason}] page=${box.pageIndex + 1}, bbox=${JSON.stringify(box.bbox)}`}
+                />
+              ))}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsPreviewModalOpen(false)} disabled={isApplying}>
+            닫기
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#5A4ACD",
+              color: "#fff",
+              fontWeight: "bold",
+              padding: "12px 24px",
+              fontSize: "16px",
+              borderRadius: "6px",
+              "&:hover": { backgroundColor: "#4638c5" },
+            }}
+            onClick={handleFinalUpload}
+            disabled={isApplying}
+          >
+            {isApplying ? "최종 처리 중..." : "최종 마스킹 업로드"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

@@ -88,7 +88,9 @@ const PermissionDetailMain = () => {
 					{/* PDF 컴포넌트 */}
 					<Paper elevation={2} sx={{ padding: 2, width: "100%", margin: "auto" }}>
 						{/*<PermissionDetailPdf />*/}
-						<Button href={permission.permissionUrl}>파일보기</Button>
+						<Button href={permission.permissionUrl} target="_blank" rel="noopener noreferrer">
+							파일보기
+						</Button>
 					</Paper>
 					
 					{/* 권한 정보 */}
