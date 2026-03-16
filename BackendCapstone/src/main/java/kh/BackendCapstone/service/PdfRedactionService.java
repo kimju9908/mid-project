@@ -44,28 +44,7 @@ public class PdfRedactionService {
     private final Map<String, RedactionJob> jobs = new ConcurrentHashMap<>();
     private final Path jobBaseDir = Path.of(System.getProperty("java.io.tmpdir"), "uniguide-redaction-jobs");
 
-    public RedactionJobResDto createJob(MultipartFile file) {
-        validatePdf(file);
-        String jobId = UUID.randomUUID().toString();
-        Path jobDir = jobBaseDir.resolve(jobId);
-        Path originalPath = jobDir.resolve("original.pdf");
 
-        try {
-            Files.createDirectories(jobDir);
-            Files.write(originalPath, file.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("원본 파일 저장 중 오류가 발생했습니다.", e);
-        }
-
-        RedactionJob job = new RedactionJob(jobId, originalPath);
-        jobs.put(jobId, job);
-        job.setStatus(RedactionJobStatus.PENDING);
-        job.setMessage("업로드 완료. 탐지를 시작합니다.");
-        job.touch();
-
-        requestPreviewFromFlask(job, file);
-        return toResponse(job);
-    }
 
     public RedactionJobResDto getJob(String jobId) {
         RedactionJob job = getRequiredJob(jobId);
@@ -106,7 +85,26 @@ public class PdfRedactionService {
             throw new RuntimeException("최종 레닥션 처리 중 오류가 발생했습니다.", e);
         }
     }
+    public RedactionJobResDto createJob(MultipartFile file) {
+        validatePdf(file);
+        String jobId = UUID.randomUUID().toString();
+        Path jobDir = jobBaseDir.resolve(jobId);
+        Path originalPath = jobDir.resolve("original.pdf");
+        try {
+            Files.createDirectories(jobDir);
+            Files.write(originalPath, file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("원본 파일 저장 중 오류가 발생했습니다.", e);
+        }
+        RedactionJob job = new RedactionJob(jobId, originalPath);
+        jobs.put(jobId, job);
+        job.setStatus(RedactionJobStatus.PENDING);
+        job.setMessage("업로드 완료. 탐지를 시작합니다.");
+        job.touch();
 
+        requestPreviewFromFlask(job, file);
+        return toResponse(job);
+    }
     private void requestPreviewFromFlask(RedactionJob job, MultipartFile file) {
         try {
             byte[] bytes = file.getBytes();
@@ -116,7 +114,6 @@ public class PdfRedactionService {
                     return file.getOriginalFilename() == null ? "original.pdf" : file.getOriginalFilename();
                 }
             };
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -131,11 +128,9 @@ public class PdfRedactionService {
                     entity,
                     String.class
             );
-
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 throw new RuntimeException("Flask preview 응답이 비어있습니다.");
             }
-
             JsonNode root = objectMapper.readTree(response.getBody());
             List<RedactionBoxDto> boxes = parseBoxes(root.path("detectedBoxes"));
             List<PreviewImageDto> previews = parsePreviews(root.path("previewImages"));
@@ -144,7 +139,6 @@ public class PdfRedactionService {
             if (pipeline.isBlank()) {
                 pipeline = "AUTO";
             }
-
             job.setDetectedBoxes(boxes);
             job.setPreviewImages(previews);
             job.setPipelineType(pipeline);

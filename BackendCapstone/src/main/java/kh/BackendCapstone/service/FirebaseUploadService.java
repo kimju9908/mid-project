@@ -140,7 +140,6 @@ public String uploadPermissionFile(MultipartFile file, String folderPath) {
 			throw new RuntimeException("Firebase 업로드 중 오류가 발생했습니다.", e);
 		}
 	}
-
 	public String uploadPermissionMaskedPdf(byte[] fileBytes, String fileName) {
 		Member member = memberService.convertTokenToEntity();
 		if (member == null || member.getMemberId() == null) {
@@ -149,7 +148,6 @@ public String uploadPermissionFile(MultipartFile file, String folderPath) {
 		String permissionFolderPath = "permission/" + member.getMemberId();
 		return uploadBytesToFirebase(fileBytes, fileName, permissionFolderPath);
 	}
-
 	private String extractUrlFromUploadResponse(String responseBody) {
 		if (responseBody == null || responseBody.isBlank()) {
 			throw new RuntimeException("Firebase 업로드 응답이 비어 있습니다.");
