@@ -41,7 +41,7 @@ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		.cors().configurationSource(request -> {
 			CorsConfiguration corsConfig = new CorsConfiguration();
 			corsConfig.setAllowedOrigins(List.of("https://localhost:8111", "http://localhost:8111")); // 프론트엔드 도메인
-			corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+			corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 			corsConfig.setAllowCredentials(true); // 쿠키 허용
 			corsConfig.addAllowedHeader("*");
 			corsConfig.setExposedHeaders(List.of(HttpHeaders.CONTENT_DISPOSITION));  // Content-Disposition 헤더 노출

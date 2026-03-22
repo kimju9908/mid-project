@@ -1,8 +1,14 @@
 package kh.BackendCapstone.controller;
 
+import kh.BackendCapstone.dto.request.BankAccountUpdateReqDto;
 import kh.BackendCapstone.dto.request.MemberReqDto;
+import kh.BackendCapstone.dto.request.NicknameReqDto;
+import kh.BackendCapstone.dto.request.PasswordReqDto;
+import kh.BackendCapstone.dto.request.PermissionReqDto;
+import kh.BackendCapstone.dto.request.RevenueReqDto;
 import kh.BackendCapstone.dto.response.MemberPermissionResDto;
 import kh.BackendCapstone.dto.response.MemberResDto;
+import kh.BackendCapstone.dto.response.OperationResDto;
 import kh.BackendCapstone.entity.Member;
 import kh.BackendCapstone.security.SecurityUtil;
 import kh.BackendCapstone.service.AuthService;
@@ -12,147 +18,161 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/member")
+@RequestMapping("/members")
 @CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class MemberController {
 
-	private final MemberService memberService;
-	private final AuthService authService;
-	private final PasswordEncoder passwordEncoder;
+    private final MemberService memberService;
+    private final AuthService authService;
+    private final PasswordEncoder passwordEncoder;
+
+    @GetMapping
+    public ResponseEntity<List<MemberResDto>> allMember() {
+        return ResponseEntity.ok(memberService.allMember());
+    }
 
 
-	// 전체 회원 조회
-	@GetMapping("/list")
-	public ResponseEntity<List<MemberResDto>> allMember() {
-		List<MemberResDto> rsp = memberService.allMember();
-		log.info("rsp : {}", rsp);
-		return ResponseEntity.ok(rsp);
-	}
+    @GetMapping(params = "email")
+    public ResponseEntity<MemberResDto> findMember(@RequestParam String email) {
+        return ResponseEntity.ok(memberService.findMemberByEmail(email));
+    }
 
-	// 회원 이메일 조회
-	@GetMapping("/{email}")
-	public ResponseEntity<MemberResDto> findMember(@PathVariable String email) {
-		MemberResDto memberResDto = memberService.findMemberByEmail(email);
-		log.info("memberResDto : {}", memberResDto);
-		return ResponseEntity.ok(memberResDto);
-	}
-	@GetMapping("/nickName")
-	public ResponseEntity<String> getEmailFromToken() {
-		try {
-			String nickName = memberService.convertTokenToEntity().getNickName();
-			return ResponseEntity.ok(nickName);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
-		}
-	}
+    @GetMapping("/me")
+    public ResponseEntity<Member> getMemberDetails() {
+        return ResponseEntity.ok(memberService.convertTokenToEntity());
+    }
 
+    @GetMapping("/me/nickname")
+    public ResponseEntity<String> getNickName() {
+        return ResponseEntity.ok(memberService.convertTokenToEntity().getNickName());
+    }
 
-	@PostMapping("/updateUser")
-	public ResponseEntity<Boolean> updateMember(@RequestBody MemberReqDto memberReqDto) {
-		boolean isSuccess = memberService.updateMember(memberReqDto);
-		log.info("수정 성공 여부 : {}", isSuccess);
-		return ResponseEntity.ok(isSuccess);
-	}
+    @PatchMapping("/me")
+    public ResponseEntity<OperationResDto> updateMember(@RequestBody MemberReqDto memberReqDto) {
+        boolean isSuccess = memberService.updateMember(memberReqDto);
+        HttpStatus status = isSuccess ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(OperationResDto.builder()
+                .success(isSuccess)
+                .message(isSuccess ? "회원 정보가 수정되었습니다." : "회원 정보 수정에 실패했습니다.")
+                .build());
+    }
 
-	@GetMapping("/memberId")
-	public ResponseEntity<Long> getMemberIdFromToken() {
-		try {
-			Long memberId = memberService.convertTokenToEntity().getMemberId();
-			return ResponseEntity.ok(memberId);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Long.valueOf("Invalid token"));
-		}
-	}
+    @GetMapping("/me/id")
+    public ResponseEntity<Long> getMemberId() {
+        return ResponseEntity.ok(memberService.convertTokenToEntity().getMemberId());
+    }
 
-	@GetMapping("/deleteUser")
-	public ResponseEntity<Boolean> deleteMember( ) {
-		Long memberId = SecurityUtil.getCurrentMemberId();
-		boolean isSuccess = memberService.deleteMember(memberId);
-		log.info("삭제 성공 여부 : {}", isSuccess);
-		return ResponseEntity.ok(isSuccess);
-	}
-	// 받는거
-	@GetMapping("/role")
-	public ResponseEntity<String> isRole() {
-		String role = memberService.getRole();
-		return ResponseEntity.ok(role);
-	}
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMember() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        boolean isSuccess = memberService.deleteMember(memberId);
+        return isSuccess ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
 
-	@GetMapping("/revenue")
-	public ResponseEntity<Integer> getRevenue() {
-		try {
-			int revenue = memberService.getRevenue();
-			return ResponseEntity.ok(revenue);
-		} catch (Exception e) {
-			// 예외 로깅
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
-	}
-	@GetMapping("/saveRevenue")
-	public ResponseEntity<String> saveRevenue(@RequestParam Long profit) {
-		try {
-			// 서비스 계층의 saveRevenue 호출
-			memberService.saveRevenue(profit);
+    @GetMapping("/me/role")
+    public ResponseEntity<String> isRole() {
+        return ResponseEntity.ok(memberService.getRole());
+    }
 
-			return ResponseEntity.ok("수익금이 정상적으로 처리되었습니다.");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(500).body("수익금 처리 실패: " + e.getMessage());
-		}
-	}
-
-	@GetMapping("/details")
-	public ResponseEntity<Member> getMemberDetails() {
-		try {
-			Member member = memberService.convertTokenToEntity();
-			return ResponseEntity.ok(member);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		}
-	}
-
-	@PostMapping("/check-password")
-	public ResponseEntity<Boolean> checkPassword(@RequestBody MemberReqDto memberReqDto) {
-		boolean isValid = memberService.checkPassword( memberReqDto.getPwd());
-		return ResponseEntity.ok(isValid);  // 로그인 성공 시 trueㅌ, 실패 시 false 반환
-	}
+    @GetMapping("/me/revenue")
+    public ResponseEntity<Integer> getRevenue() {
+        return ResponseEntity.ok(memberService.getRevenue());
+    }
 
 
-	@PostMapping("/updatePassword")
-	public ResponseEntity<Boolean> changePassword(@RequestBody MemberReqDto memberReqDto) {
-		try {
-			memberService.updatePassword(memberReqDto.getPwd(), passwordEncoder); // 비밀번호 변경 로직 호출
-			return ResponseEntity.ok(true); // 성공적으로 변경되었음을 true로 반환
-		} catch (RuntimeException e) {
-			return ResponseEntity.ok(false); // 실패했음을 false로 반환
-		}
-	}
+    @PostMapping("/me/revenue")
+    public ResponseEntity<OperationResDto> saveRevenue(@RequestBody RevenueReqDto revenueReqDto) {
+        memberService.saveRevenue(revenueReqDto.getProfit());
+        return ResponseEntity.status(HttpStatus.CREATED).body(OperationResDto.builder()
+                .success(true)
+                .message("수익금이 정상적으로 처리되었습니다.")
+                .build());
+    }
 
+    @PostMapping("/me/password/verify")
+    public ResponseEntity<Boolean> checkPassword(@RequestBody PasswordReqDto passwordReqDto) {
+        return ResponseEntity.ok(memberService.checkPassword(passwordReqDto.getPwd()));
+    }
 
-	@PostMapping("/changeNickName")
-	public ResponseEntity<Boolean> changeNickName(@RequestBody MemberReqDto memberReqDto) {
-		boolean isValid = memberService.changeNickName(memberReqDto.getNickname());
-		return ResponseEntity.ok(isValid);
-	}
+    @PatchMapping("/me/password")
+    public ResponseEntity<OperationResDto> changePassword(@RequestBody PasswordReqDto passwordReqDto) {
+        try {
+            memberService.updatePassword(passwordReqDto.getPwd(), passwordEncoder);
+            return ResponseEntity.ok(OperationResDto.builder()
+                    .success(true)
+                    .message("비밀번호가 성공적으로 변경되었습니다.")
+                    .build());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(OperationResDto.builder()
+                    .success(false)
+                    .message("비밀번호 변경에 실패했습니다.")
+                    .build());
+        }
+    }
 
-	@GetMapping("/permission")
-	public ResponseEntity<List<MemberPermissionResDto>> convertTokenToPermission() {
-		try {
-			List<MemberPermissionResDto> memberPermissionResDtos = memberService.convertPermission();
-			System.out.println("memberPermissionResDtos : " + memberPermissionResDtos);
-			return ResponseEntity.ok(memberPermissionResDtos);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		}
-	}
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<OperationResDto> changeNickName(@RequestBody NicknameReqDto nicknameReqDto) {
+        boolean isSuccess = memberService.changeNickName(nicknameReqDto.getNickname());
+        HttpStatus status = isSuccess ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(OperationResDto.builder()
+                .success(isSuccess)
+                .message(isSuccess ? "닉네임이 변경되었습니다." : "닉네임 변경에 실패했습니다.")
+                .build());
+    }
+
+    @GetMapping("/me/permissions")
+    public ResponseEntity<List<MemberPermissionResDto>> convertTokenToPermission() {
+        return ResponseEntity.ok(memberService.convertPermission());
+    }
+
+    @PostMapping("/me/permissions")
+    public ResponseEntity<OperationResDto> savePermission(@RequestBody PermissionReqDto permissionReqDto) {
+        boolean saved = authService.savePermission(permissionReqDto.getPermissionUrl());
+        HttpStatus status = saved ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(status).body(OperationResDto.builder()
+                .success(saved)
+                .message(saved ? "증빙 파일이 저장되었습니다." : "증빙 파일 저장에 실패했습니다.")
+                .build());
+    }
+
+    @PatchMapping("/{memberId}/bank-account")
+    public ResponseEntity<OperationResDto> changeBankInfo(
+            @PathVariable Long memberId,
+            @RequestBody BankAccountUpdateReqDto requestDto
+    ) {
+        try {
+            boolean isUpdated = memberService.updateBankInfo(memberId, requestDto.getBankName(), requestDto.getBankAccount());
+            if (!isUpdated) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(OperationResDto.builder()
+                        .success(false)
+                        .message("사용자를 찾을 수 없습니다.")
+                        .build());
+            }
+            return ResponseEntity.ok(OperationResDto.builder()
+                    .success(true)
+                    .message("은행 정보가 성공적으로 변경되었습니다.")
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(OperationResDto.builder()
+                    .success(false)
+                    .message("서버 오류가 발생했습니다.")
+                    .build());
+        }
+    }
 }
-

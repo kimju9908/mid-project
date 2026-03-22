@@ -56,7 +56,7 @@ const ChattingApi = {
   // 토큰에서 닉네임 가져오기
   getNickName: async () => {
     const token = localStorage.getItem("accessToken");
-    const response = await axios.get(Capstone + `/member/nickName`, {
+    const response = await axios.get(Capstone + `/members/me/nickname`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

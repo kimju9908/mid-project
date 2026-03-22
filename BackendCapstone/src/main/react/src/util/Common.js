@@ -73,21 +73,13 @@ const Commons = {
   // 401 에러 처리 함수
   handleUnauthorized: async () => {
     console.log("handleUnauthorized!!!");
-    const accessToken = Commons.getAccessToken();
     const refreshToken = Commons.getRefreshToken();
-    const config = {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    };
     try {
-      const rsp = await axios.post(
-        `${Commons.Capstone}/auth/refresh`,
+      const rsp = await axios.post(`${Commons.Capstone}/auth/refresh`, {
         refreshToken,
-        config
-      );
+      });
       console.log(rsp.data);
-      Commons.setAccessToken(rsp.data);
+      Commons.setAccessToken(rsp.data.accessToken);
     } catch (e) {
       console.log(e);
       return false;
@@ -95,7 +87,7 @@ const Commons = {
   },
 
   getTokenByMemberId: async () => {
-    return await axiosInstance.get( `/member/memberId`);
+    return await axiosInstance.get(`/members/me/id`);
   },
 
   // 로그인 여부 확인 함수
