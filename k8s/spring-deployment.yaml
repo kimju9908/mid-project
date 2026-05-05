@@ -19,8 +19,69 @@ spec:
         - containerPort: 8111
         env:
         - name: SPRING_DATASOURCE_URL
-          value: "jdbc:mysql://mysql-service:3306/uniguide?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul"
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: SPRING_DATASOURCE_URL
         - name: SPRING_DATASOURCE_USERNAME
-          value: "root"
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: SPRING_DATASOURCE_USERNAME
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "1234"
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: SPRING_DATASOURCE_PASSWORD
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: JWT_SECRET
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: MAIL_PASSWORD
+        - name: GOOGLE_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: GOOGLE_CLIENT_SECRET
+        - name: KAKAO_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: KAKAO_CLIENT_SECRET
+        - name: NAVER_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: NAVER_CLIENT_SECRET
+        - name: NURIGO_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: NURIGO_API_KEY
+        - name: NURIGO_API_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: NURIGO_API_SECRET
+        - name: NURIGO_SENDER
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: NURIGO_SENDER
+        - name: CODEF_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: CODEF_CLIENT_ID
+        - name: CODEF_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: spring-secret
+              key: CODEF_SECRET_KEY
+        - name: FLASK_BASE_URL
+          value: "http://flask-service:5000"

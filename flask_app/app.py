@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -9,7 +11,10 @@ from route.redaction import preview_redaction, apply_redaction
 app = Flask(__name__)
 
 # 데이터베이스 URI 및 설정
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost:3306/capstone?charset=utf8&timezone=Asia/Seoul'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
+    'FLASK_DB_URL',
+    'mysql+pymysql://root:1234@localhost:3306/capstone?charset=utf8'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # SQLAlchemy 객체 생성
@@ -24,4 +29,4 @@ app.add_url_rule('/spring/redaction/preview', 'preview_redaction', preview_redac
 app.add_url_rule('/spring/redaction/apply', 'apply_redaction', apply_redaction, methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(app.run(host="0.0.0.0", port=5000))
+    app.run(host="0.0.0.0", port=5000)
