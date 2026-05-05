@@ -24,4 +24,4 @@ app.add_url_rule('/spring/redaction/preview', 'preview_redaction', preview_redac
 app.add_url_rule('/spring/redaction/apply', 'apply_redaction', apply_redaction, methods=['POST'])
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(app.run(host="0.0.0.0", port=5000))

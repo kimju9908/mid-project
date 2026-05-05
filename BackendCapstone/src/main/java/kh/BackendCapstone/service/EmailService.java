@@ -48,6 +48,7 @@ public class    EmailService {
         int token = (int) (Math.random() * 900000) + 100000;
         return String.valueOf(token);
     }
+
     private void storeToken(String email, String token) {
         Optional<email_auth_token> existingToken = emailAuthTokenRepository.findByEmail(email);
         emailAuthTokenRepository.deleteByEmail(email);

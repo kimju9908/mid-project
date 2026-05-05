@@ -1,23 +1,28 @@
 package kh.BackendCapstone.service;
 
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kh.BackendCapstone.constant.Active;
 import kh.BackendCapstone.entity.Member;
-import kh.BackendCapstone.entity.Permission;
 import kh.BackendCapstone.repository.PermissionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -63,6 +68,8 @@ public class FirebaseUploadService {
 			return "파일 업로드 중 오류가 발생했습니다.";
 		}
 	}
+
+
 @Transactional
 public String uploadPermissionFile(MultipartFile file, String folderPath) {
 	try {
@@ -148,6 +155,7 @@ public String uploadPermissionFile(MultipartFile file, String folderPath) {
 		String permissionFolderPath = "permission/" + member.getMemberId();
 		return uploadBytesToFirebase(fileBytes, fileName, permissionFolderPath);
 	}
+
 	private String extractUrlFromUploadResponse(String responseBody) {
 		if (responseBody == null || responseBody.isBlank()) {
 			throw new RuntimeException("Firebase 업로드 응답이 비어 있습니다.");
@@ -163,6 +171,56 @@ public String uploadPermissionFile(MultipartFile file, String folderPath) {
 			log.error("Firebase 업로드 응답 파싱 실패 : {}", responseBody, e);
 			throw new RuntimeException("Firebase 업로드 응답 파싱 실패", e);
 		}
+	}
+
+	private String sanitizeFolderPath(String folderPath) {
+		if (!StringUtils.hasText(folderPath)) {
+			return "benchmark/default";
+		}
+		String sanitized = folderPath.replace("\\", "/").trim();
+		sanitized = sanitized.replaceAll("\\.\\.", "");
+		sanitized = sanitized.replaceAll("^/+", "");
+		sanitized = sanitized.replaceAll("/+$", "");
+		return sanitized.isBlank() ? "benchmark/default" : sanitized;
+	}
+
+	private String resolveFileName(MultipartFile file, String fileName) {
+		String candidate = StringUtils.hasText(fileName) ? fileName : file.getOriginalFilename();
+		if (!StringUtils.hasText(candidate)) {
+			return UUID.randomUUID() + ".bin";
+		}
+
+		String cleaned = StringUtils.getFilename(candidate);
+		if (!StringUtils.hasText(cleaned)) {
+			return UUID.randomUUID() + ".bin";
+		}
+		return cleaned.replaceAll("\\s+", "_");
+	}
+
+	private String resolveBucketName() {
+		String bucketName = System.getenv("FIREBASE_STORAGE_BUCKET");
+		if (StringUtils.hasText(bucketName)) {
+			return bucketName;
+		}
+
+		String projectId = System.getenv("GOOGLE_CLOUD_PROJECT");
+		if (!StringUtils.hasText(projectId)) {
+			projectId = StorageOptions.getDefaultInstance().getProjectId();
+		}
+		if (!StringUtils.hasText(projectId)) {
+			throw new RuntimeException("FIREBASE_STORAGE_BUCKET 또는 GOOGLE_CLOUD_PROJECT 환경변수가 필요합니다.");
+		}
+		return projectId + ".appspot.com";
+	}
+
+	private String buildPublicUrl(String bucketName, String objectPath) {
+		String encodedPath = URLEncoder.encode(objectPath, StandardCharsets.UTF_8)
+				.replace("+", "%20");
+		return String.format(
+				"https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
+				bucketName,
+				encodedPath
+		);
 	}
 
 

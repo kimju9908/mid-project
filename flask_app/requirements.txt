@@ -1,0 +1,9 @@
+flask
+flask_sqlalchemy
+flask_cors
+requests
+google-cloud-storage
+firebase-admin
+aiohttp
+PyMuPDF
+pymysql

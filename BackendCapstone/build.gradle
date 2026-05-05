@@ -13,6 +13,7 @@ java {
 	}
 }
 
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -80,6 +81,7 @@ sourceSets { // 리액트 디렉토리를 리소스 디렉토리로 설정
 }
 
 processResources { dependsOn "copyReactBuildFiles" } // 리액트 빌드 파일들을 복사해준다.
+bootRun { dependsOn "copyReactBuildFiles" } // bootRun 시에도 리액트 빌드본을 먼저 반영한다.
 
 task installReact(type: Exec) { // 리액트 설치
 	workingDir "$reactDir"
