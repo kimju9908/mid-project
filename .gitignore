@@ -3,3 +3,27 @@ node_modules
 yarn.lock
 .idea/**
 .idea
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Vim swap files
+*.swp
+*.swo
+
+# Claude Code internal
+.claude/
+
+# Firebase backup folders
+flask_app/firebase/**/backup/
+
+# 루트 불필요 파일
+/flask
+/mysql-deployment.yaml
