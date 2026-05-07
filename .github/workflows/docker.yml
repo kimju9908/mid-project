@@ -31,3 +31,21 @@ jobs:
           context: ./flask_app
           push: true
           tags: samgreend/flask-app:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+            kubectl rollout restart deployment spring-deployment
+            kubectl rollout restart deployment flask-deployment
+            kubectl rollout status deployment spring-deployment
+            kubectl rollout status deployment flask-deployment
