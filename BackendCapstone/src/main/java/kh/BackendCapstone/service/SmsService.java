@@ -8,14 +8,16 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Service
 @Transactional
@@ -23,16 +25,19 @@ public class SmsService {
     private static final Logger logger = LoggerFactory.getLogger(SmsService.class);
     private final DefaultMessageService messageService;
     private final SmsAuthTokenRepository smsAuthTokenRepository;
+    private final String senderPhone;
     private final ConcurrentHashMap<String, Integer> requestCountMap = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Long> requestTimeMap = new ConcurrentHashMap<>(); // 요청 시간 기록
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
-    public SmsService(SmsAuthTokenRepository smsAuthTokenRepository) {
-        this.messageService = NurigoApp.INSTANCE.initialize(
-                "NCSA2P34FVE6IQAD",
-                "JRSY3JEUEFF2NZM0WBZGLYO1CM9FGXQK",
-                "https://api.coolsms.co.kr"
-        );
+    public SmsService(
+            SmsAuthTokenRepository smsAuthTokenRepository,
+            @Value("${nurigo.api-key}") String apiKey,
+            @Value("${nurigo.api-secret}") String apiSecret,
+            @Value("${nurigo.sender}") String sender
+    ) {
+        this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
         this.smsAuthTokenRepository = smsAuthTokenRepository;
+        this.senderPhone = sender;
     }
 
     public String sendVerificationCode(String phone) {
@@ -64,7 +69,7 @@ public class SmsService {
             // 6) 문자 발송
             try {
                 Message message = new Message();
-                message.setFrom("01052218948");
+                message.setFrom(senderPhone);
                 message.setTo(phone);
                 message.setText("[본인인증] 인증번호: " + verificationCode);
                 messageService.send(message);
@@ -145,16 +150,10 @@ public class SmsService {
 
     private void resetRequestCountAfterDelay(String phone) {
         // 5시간 후에 인증 횟수 초기화
-        long delay = 5 * 60 * 60 * 1000; // 5시간을 밀리초로 변환
-        new Thread(() -> {
-            try {
-                Thread.sleep(delay);
-                requestCountMap.remove(phone);  // 5시간 후에 해당 전화번호의 인증 횟수 초기화
-                logger.info("인증 요청 횟수 초기화: {}", phone);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }).start();
+        scheduler.schedule(() -> {
+            requestCountMap.remove(phone);
+            logger.info("인증 요청 횟수 초기화: {}", phone);
+        }, 5, TimeUnit.HOURS);
     }
 
 }
